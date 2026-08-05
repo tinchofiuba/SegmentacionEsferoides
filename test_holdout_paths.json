@@ -1,0 +1,592 @@
+[
+    {
+        "microscope": "Cytation5",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Cytation5/Images/CT5.3hTERT/CT5.3hTERT_DMEMF12_LiquidOverlay_6000cells_48h_B1_T2_4x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Cytation5/Manual segmentations/CT5.3hTERT/CT5.3hTERT_DMEMF12_LiquidOverlay_6000cells_48h_B1_T2_4x.tiff"
+    },
+    {
+        "microscope": "Cytation5",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Cytation5/Images/CT5.3hTERT/CT5.3hTERT_DMEMLG_LiquidOverlay_6000cells_48h_B1_T14_4x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Cytation5/Manual segmentations/CT5.3hTERT/CT5.3hTERT_DMEMLG_LiquidOverlay_6000cells_48h_B1_T14_4x.tiff"
+    },
+    {
+        "microscope": "Cytation5",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Cytation5/Images/CT5.3hTERT/CT5.3hTERT_DMEMLG_LiquidOverlay_6000cells_48h_B1_T18_4x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Cytation5/Manual segmentations/CT5.3hTERT/CT5.3hTERT_DMEMLG_LiquidOverlay_6000cells_48h_B1_T18_4x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/SKOV3/SKOV3_DMEMLG_HangingDrop_2000cells_72h_B1_T1_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/SKOV3/SKOV3_DMEMLG_HangingDrop_2000cells_72h_B1_T1_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/PANC1/PANC1_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B2_T12_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/PANC1/PANC1_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B2_T12_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/4T1/4T1_DMEMHG_HangingDrop_2000cells_72h_B1_T2_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/4T1/4T1_DMEMHG_HangingDrop_2000cells_72h_B1_T2_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/A549/A549_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B4_T10_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/A549/A549_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B4_T10_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/SKOV3/SKOV3_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B6_T1_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/SKOV3/SKOV3_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B6_T1_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/SKOV3/SKOV3_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T16_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/SKOV3/SKOV3_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T16_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/HCT116/HCT116_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T2_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/HCT116/HCT116_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T2_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/A549/A549_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B4_T3_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/A549/A549_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B4_T3_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/SKOV3/SKOV3_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T1_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/SKOV3/SKOV3_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T1_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/SKOV3/SKOV3_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B6_T8_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/SKOV3/SKOV3_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B6_T8_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/HEPG2/HEPG2_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T11_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/HEPG2/HEPG2_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T11_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/HEPG2/HEPG2_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T2_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/HEPG2/HEPG2_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T2_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/A549/A549_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B2_T3_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/A549/A549_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B2_T3_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/A549/A549_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B5_T1_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/A549/A549_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B5_T1_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/PANC1/PANC1_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B3_T8_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/PANC1/PANC1_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B3_T8_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/A549/A549_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B5_T3_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/A549/A549_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B5_T3_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/PANC1/PANC1_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B3_T5_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/PANC1/PANC1_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B3_T5_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/A549/A549_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B6_T5_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/A549/A549_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B6_T5_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/SKOV3/SKOV3_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B5_T8_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/SKOV3/SKOV3_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B5_T8_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/A549/A549_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B3_T9_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/A549/A549_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B3_T9_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/PANC1/PANC1_DMEMHG_HangingDrop_2000cells_72h_B3_T6_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/PANC1/PANC1_DMEMHG_HangingDrop_2000cells_72h_B3_T6_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/HEPG2/HEPG2_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B3_T2_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/HEPG2/HEPG2_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B3_T2_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/4T1/4T1_DMEMHG_HangingDrop_2000cells_72h_B2_T3_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/4T1/4T1_DMEMHG_HangingDrop_2000cells_72h_B2_T3_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/D2A1LUCmCherry/D2A1LUCmCherry_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B1_T12_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/D2A1LUCmCherry/D2A1LUCmCherry_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B1_T12_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/PANC1/PANC1_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B1_T8_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/PANC1/PANC1_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B1_T8_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/SKOV3/SKOV3_DMEMLG_HangingDrop_2000cells_72h_B1_T2_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/SKOV3/SKOV3_DMEMLG_HangingDrop_2000cells_72h_B1_T2_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/PANC1/PANC1_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B5_T6_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/PANC1/PANC1_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B5_T6_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/HCT116/HCT116_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T9_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/HCT116/HCT116_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T9_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/HEPG2/HEPG2_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B3_T1_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/HEPG2/HEPG2_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B3_T1_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/HCT116/HCT116_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B6_T1_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/HCT116/HCT116_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B6_T1_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/HCT116/HCT116_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B4_T4_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/HCT116/HCT116_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B4_T4_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/PANC1/PANC1_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B5_T5_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/PANC1/PANC1_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B5_T5_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/SKOV3/SKOV3_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T5_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/SKOV3/SKOV3_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T5_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/A549/A549_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B2_T2_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/A549/A549_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B2_T2_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/A549/A549_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B2_T9_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/A549/A549_DMEMLG_LiquidOverlay-ULA_2000cells_72h_B2_T9_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/SKOV3/SKOV3_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T9_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/SKOV3/SKOV3_DMEMHG_LiquidOverlay-ULA_2000cells_72h_B2_T9_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteZOOM",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Images/SKOV3/SKOV3_DMEMLG_HangingDrop_2000cells_72h_B1_T5_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteZOOM/Manual segmentations/SKOV3/SKOV3_DMEMLG_HangingDrop_2000cells_72h_B1_T5_10x.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-Matrigel/T8/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_011h_B1_T8_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-Matrigel/T8/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_011h_B1_T8_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-Matrigel/T7/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_033h_B1_T7_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-Matrigel/T7/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_033h_B1_T7_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-BME/T2/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_012h_B1_T2_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-BME/T2/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_012h_B1_T2_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-BME/T2/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_266h_B1_T2_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-BME/T2/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_266h_B1_T2_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-Matrigel/T2/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_003h_B1_T2_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-Matrigel/T2/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_003h_B1_T2_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-Matrigel/T7/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_011h_B1_T7_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-Matrigel/T7/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_011h_B1_T7_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-Matrigel/T1/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_018h_B1_T1_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-Matrigel/T1/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_018h_B1_T1_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-BME/T2/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_058h_B1_T2_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-BME/T2/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_058h_B1_T2_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-BME/T6/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_017h_B1_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-BME/T6/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_017h_B1_T6_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-Matrigel/T6/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_017h_B1_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-Matrigel/T6/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_017h_B1_T6_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-BME/T6/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_003h_B1_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-BME/T6/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_003h_B1_T6_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-BME/T7/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_362h_B1_T7_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-BME/T7/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_362h_B1_T7_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-BME/T6/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_086h_B1_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-BME/T6/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_086h_B1_T6_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-Matrigel/T4/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_067h_B1_T4_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-Matrigel/T4/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_067h_B1_T4_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-BME/T4/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_206h_B1_T4_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-BME/T4/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_206h_B1_T4_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-Matrigel/T2/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_006h_B1_T2_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-Matrigel/T2/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_006h_B1_T2_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-BME/T2/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_206h_B1_T2_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-BME/T2/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_206h_B1_T2_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-BME/T6/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_070h_B1_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-BME/T6/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_070h_B1_T6_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-Matrigel/T2/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_073h_B1_T2_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-Matrigel/T2/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_073h_B1_T2_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-Matrigel/T6/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_019h_B1_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-Matrigel/T6/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_019h_B1_T6_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-Matrigel/T6/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_041h_B1_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-Matrigel/T6/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_041h_B1_T6_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-BME/T7/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_350h_B1_T7_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-BME/T7/MCF10A_DMEMF12-BME_LiquidOverlay-ULA_3000cells_350h_B1_T7_10X.tiff"
+    },
+    {
+        "microscope": "IncucyteS3",
+        "image": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Images/MCF10A-Matrigel/T6/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_018h_B1_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/IncucyteS3/Manual segmentations/MCF10A-Matrigel/T6/MCF10A_DMEMF12-Matrigel_LiquidOverlay-ULA_3000cells_018h_B1_T6_10X.tiff"
+    },
+    {
+        "microscope": "OlympusIX05",
+        "image": "/home/martin/Descargas/datasetsEsferoides/OlympusIX05/Images/VCAP/VCAP_DMEMHG_LiquidOverlay-ULA_2000cells_168h_B1_T3_4X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/OlympusIX05/Manual segmentations/VCAP/VCAP_DMEMHG_LiquidOverlay-ULA_2000cells_168h_B1_T3_4X.tiff"
+    },
+    {
+        "microscope": "OlympusIX05",
+        "image": "/home/martin/Descargas/datasetsEsferoides/OlympusIX05/Images/VCAP/VCAP_DMEMHG_LiquidOverlay-ULA_2000cells_168h_B2_T3_4X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/OlympusIX05/Manual segmentations/VCAP/VCAP_DMEMHG_LiquidOverlay-ULA_2000cells_168h_B2_T3_4X.tiff"
+    },
+    {
+        "microscope": "OlympusIX05",
+        "image": "/home/martin/Descargas/datasetsEsferoides/OlympusIX05/Images/VCAP/VCAP_DMEMHG_LiquidOverlay-ULA_2000cells_168h_B3_T2_4X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/OlympusIX05/Manual segmentations/VCAP/VCAP_DMEMHG_LiquidOverlay-ULA_2000cells_168h_B3_T2_4X.tiff"
+    },
+    {
+        "microscope": "OlympusIX05",
+        "image": "/home/martin/Descargas/datasetsEsferoides/OlympusIX05/Images/MRC5/MRC5_EMEM_LiquidOverlay-ULA_10000cells_72h_B3_T5_4X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/OlympusIX05/Manual segmentations/MRC5/MRC5_EMEM_LiquidOverlay-ULA_10000cells_72h_B3_T5_4X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/D2A1LUCmCherry/D2A1LUCmCherry_DMEMLG_HangingDrop_2000cells_72h_B2_T1_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/D2A1LUCmCherry/D2A1LUCmCherry_DMEMLG_HangingDrop_2000cells_72h_B2_T1_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/HEPG2/HEPG2_DMEMLG_HangingDrop_2000cells_72h_B1_T5_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/HEPG2/HEPG2_DMEMLG_HangingDrop_2000cells_72h_B1_T5_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/HEPG2/HEPG2_DMEMLG_HangingDrop_2000cells_72h_B4_T2_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/HEPG2/HEPG2_DMEMLG_HangingDrop_2000cells_72h_B4_T2_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/A549/A549_DMEMHG_HangingDrop_2000cells_72h_B1_T6_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/A549/A549_DMEMHG_HangingDrop_2000cells_72h_B1_T6_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/SKOV3/SKOV3_DMEMLG_HangingDrop_2000cells_72h_B1_T3_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/SKOV3/SKOV3_DMEMLG_HangingDrop_2000cells_72h_B1_T3_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/ASC/315_Cells/ASC_DMEMLG_LiquidOverlay-Microchip_315cells_48h_B1_T1_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/ASC/315_Cells/ASC_DMEMLG_LiquidOverlay-Microchip_315cells_48h_B1_T1_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/SKOV3/SKOV3_DMEMHG_HangingDrop_2000cells_72h_B1_T6_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/SKOV3/SKOV3_DMEMHG_HangingDrop_2000cells_72h_B1_T6_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/SKOV3/SKOV3_DMEMLG_HangingDrop_2000cells_72h_B3_T7_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/SKOV3/SKOV3_DMEMLG_HangingDrop_2000cells_72h_B3_T7_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/PANC1/PANC1_DMEMHG_HangingDrop_2000cells_72h_B2_T3_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/PANC1/PANC1_DMEMHG_HangingDrop_2000cells_72h_B2_T3_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/HEPG2/HEPG2_DMEMHG_HangingDrop_2000cells_72h_B2_T6_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/HEPG2/HEPG2_DMEMHG_HangingDrop_2000cells_72h_B2_T6_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/D2A1LUCmCherry/D2A1LUCmCherry_DMEMHG_HangingDrop_2000cells_72h_B3_T3_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/D2A1LUCmCherry/D2A1LUCmCherry_DMEMHG_HangingDrop_2000cells_72h_B3_T3_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/A549/A549_DMEMHG_HangingDrop_2000cells_72h_B1_T7_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/A549/A549_DMEMHG_HangingDrop_2000cells_72h_B1_T7_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/HEPG2/HEPG2_DMEMLG_HangingDrop_2000cells_72h_B3_T4_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/HEPG2/HEPG2_DMEMLG_HangingDrop_2000cells_72h_B3_T4_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/A549/A549_DMEMHG_HangingDrop_2000cells_72h_B3_T4_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/A549/A549_DMEMHG_HangingDrop_2000cells_72h_B3_T4_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/A549/A549_DMEMHG_HangingDrop_2000cells_72h_B1_T4_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/A549/A549_DMEMHG_HangingDrop_2000cells_72h_B1_T4_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/HEPG2/HEPG2_DMEMHG_HangingDrop_2000cells_72h_B1_T3_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/HEPG2/HEPG2_DMEMHG_HangingDrop_2000cells_72h_B1_T3_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/T47D/T47D_DMEMHG_HangingDrop_2000cells_72h_B2_T1_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/T47D/T47D_DMEMHG_HangingDrop_2000cells_72h_B2_T1_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/ASC/158_Cells/ASC_DMEMLG_LiquidOverlay-Microchip_158cells_144h_B1_T3_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/ASC/158_Cells/ASC_DMEMLG_LiquidOverlay-Microchip_158cells_144h_B1_T3_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/MDAMB231/946_Cells/MDAMB231_DMEMHG_LiquidOverlay-Microchip_946cells_168h_B1_T1_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/MDAMB231/946_Cells/MDAMB231_DMEMHG_LiquidOverlay-Microchip_946cells_168h_B1_T1_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/SKOV3/SKOV3_DMEMLG_HangingDrop_2000cells_72h_B3_T3_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/SKOV3/SKOV3_DMEMLG_HangingDrop_2000cells_72h_B3_T3_5X.tiff"
+    },
+    {
+        "microscope": "LeicaDMi3000B",
+        "image": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Images/HEPG2/HEPG2_DMEMLG_HangingDrop_2000cells_72h_B2_T4_5X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/LeicaDMi3000B/Manual segmentations/HEPG2/HEPG2_DMEMLG_HangingDrop_2000cells_72h_B2_T4_5X.tiff"
+    },
+    {
+        "microscope": "OperaPhenix",
+        "image": "/home/martin/Descargas/datasetsEsferoides/OperaPhenix/Images/HeLa/HeLa_RPMI_LiquidOverlay-Agarose_2000cells_96h_B1_T7_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/OperaPhenix/Manual segmentations/HeLa/HeLa_RPMI_LiquidOverlay-Agarose_2000cells_96h_B1_T7_10x.tiff"
+    },
+    {
+        "microscope": "OperaPhenix",
+        "image": "/home/martin/Descargas/datasetsEsferoides/OperaPhenix/Images/MDCK/MDCK_RPMI_LiquidOverlay-Agarose_2000cells_96h_B1_T3_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/OperaPhenix/Manual segmentations/MDCK/MDCK_RPMI_LiquidOverlay-Agarose_2000cells_96h_B1_T3_10x.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/NCIH226/2000_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_2000cells_96h_B2_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/NCIH226/2000_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_2000cells_96h_B2_T6_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/HCT15/3500_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_3500cells_96h_B1_T8_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/HCT15/3500_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_3500cells_96h_B1_T8_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/Hs578T/11000_Cells/HS578T_DMEMLG_LiquidOverlay-Agarose_11000cells_96h_B1_T1_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/Hs578T/11000_Cells/HS578T_DMEMLG_LiquidOverlay-Agarose_11000cells_96h_B1_T1_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/DLD1/3000_Cells/DLD1_DMEMLG_LiquidOverlay-Agarose_3000cells_96h_B1_T2_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/DLD1/3000_Cells/DLD1_DMEMLG_LiquidOverlay-Agarose_3000cells_96h_B1_T2_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/HCT15/4500_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_4500cells_96h_B1_T9_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/HCT15/4500_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_4500cells_96h_B1_T9_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/DLD1/3500_Cells/DLD1_DMEMLG_LiquidOverlay-Agarose_3500cells_96h_B1_T3_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/DLD1/3500_Cells/DLD1_DMEMLG_LiquidOverlay-Agarose_3500cells_96h_B1_T3_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/DLD1/3500_Cells/DLD1_DMEMLG_LiquidOverlay-Agarose_3500cells_96h_B1_T9_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/DLD1/3500_Cells/DLD1_DMEMLG_LiquidOverlay-Agarose_3500cells_96h_B1_T9_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/HCT15/4500_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_4500cells_96h_B1_T11_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/HCT15/4500_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_4500cells_96h_B1_T11_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/BT474/BT474_DMEMLG_LiquidOverlay-Agarose_3000cells_96h_B2_T2_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/BT474/BT474_DMEMLG_LiquidOverlay-Agarose_3000cells_96h_B2_T2_10x.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/NCIH226/1000_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_1000cells_96h_B1_T2_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/NCIH226/1000_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_1000cells_96h_B1_T2_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/HCT15/3500_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_3500cells_96h_B1_T16_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/HCT15/3500_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_3500cells_96h_B1_T16_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/NCIH226/3000_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_3000cells_96h_B1_T3_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/NCIH226/3000_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_3000cells_96h_B1_T3_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/Hs578T/11000_Cells/HS578T_DMEMLG_LiquidOverlay-Agarose_11000cells_96h_B1_T7_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/Hs578T/11000_Cells/HS578T_DMEMLG_LiquidOverlay-Agarose_11000cells_96h_B1_T7_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/Hs578T/12000_Cells/HS578T_DMEMLG_LiquidOverlay-Agarose_12000cells_96h_B1_T12_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/Hs578T/12000_Cells/HS578T_DMEMLG_LiquidOverlay-Agarose_12000cells_96h_B1_T12_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/BT20/500_Cells/BT20_DMEMLG_LiquidOverlay-Agarose_500cells_96h_B1_T9_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/BT20/500_Cells/BT20_DMEMLG_LiquidOverlay-Agarose_500cells_96h_B1_T9_10x.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/HCT15/5500_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_5500cells_96h_B1_T16_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/HCT15/5500_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_5500cells_96h_B1_T16_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/HCT15/6000_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_6000cells_96h_B1_T5_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/HCT15/6000_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_6000cells_96h_B1_T5_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/NCIH226/1500_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_1500cells_96h_B2_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/NCIH226/1500_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_1500cells_96h_B2_T6_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/Hs578T/11000_Cells/HS578T_DMEMLG_LiquidOverlay-Agarose_11000cells_96h_B1_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/Hs578T/11000_Cells/HS578T_DMEMLG_LiquidOverlay-Agarose_11000cells_96h_B1_T6_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/BT20/10000_Cells/BT20_DMEMLG_LiquidOverlay-Agarose_10000cells_96h_B1_T5_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/BT20/10000_Cells/BT20_DMEMLG_LiquidOverlay-Agarose_10000cells_96h_B1_T5_10x.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/BT20/1500_Cells/BT20_DMEMLG_LiquidOverlay-Agarose_1500cells_96h_B1_T3_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/BT20/1500_Cells/BT20_DMEMLG_LiquidOverlay-Agarose_1500cells_96h_B1_T3_10x.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/NCIH226/2000_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_2000cells_96h_B1_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/NCIH226/2000_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_2000cells_96h_B1_T6_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/MDAMB361/5000_Cells/MDAMB361_DMEMLG_LiquidOverlay-Agarose_5000cells_96h_B1_T6_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/MDAMB361/5000_Cells/MDAMB361_DMEMLG_LiquidOverlay-Agarose_5000cells_96h_B1_T6_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/NCIH226/4000_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_4000cells_96h_B1_T12_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/NCIH226/4000_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_4000cells_96h_B1_T12_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/MDAMB361/5000_Cells/MDAMB361_DMEMLG_LiquidOverlay-Agarose_5000cells_96h_B1_T10_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/MDAMB361/5000_Cells/MDAMB361_DMEMLG_LiquidOverlay-Agarose_5000cells_96h_B1_T10_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/NCIH226/2000_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_2000cells_96h_B2_T4_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/NCIH226/2000_Cells/NCIH226_DMEMLG_LiquidOverlay-Agarose_2000cells_96h_B2_T4_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/HCT15/5000_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_5000cells_96h_B1_T12_10X.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/HCT15/5000_Cells/HCT15_DMEMLG_LiquidOverlay-Agarose_5000cells_96h_B1_T12_10X.tiff"
+    },
+    {
+        "microscope": "Axiovert200",
+        "image": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Images/BT20/500_Cells/BT20_DMEMLG_LiquidOverlay-Agarose_500cells_96h_B1_T13_10x.ome.tiff",
+        "mask": "/home/martin/Descargas/datasetsEsferoides/Axiovert200/Manual segmentations/BT20/500_Cells/BT20_DMEMLG_LiquidOverlay-Agarose_500cells_96h_B1_T13_10x.tiff"
+    }
+]
