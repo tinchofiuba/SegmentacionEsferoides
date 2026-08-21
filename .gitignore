@@ -217,3 +217,11 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 *.pth
+
+# Datos pesados locales (No subir a GitHub)
+inputsConvertidas/
+outputs/
+Resultados_3T3/
+Resultados_Test_Final/
+*.tiff
+*.tif
