@@ -134,7 +134,7 @@ def postprocess_mask(mask, filename, empirical_thresholds):
     is_4x = "_4x" in filename
     th = empirical_thresholds["4x"] if is_4x else empirical_thresholds["10x"]
     
-    cleaned_mask = np.zeros_like(mask)
+    cleaned_mask = np.zeros(mask.shape, dtype=np.uint8)
     
     for c in [1, 2, 3]:
         class_mask = (mask == c).astype(np.uint8)
@@ -144,21 +144,30 @@ def postprocess_mask(mask, filename, empirical_thresholds):
             area = stats[i, cv2.CC_STAT_AREA]
             diam = 2 * np.sqrt(area / np.pi)
             
-            # Rule 1: Noise floor (menor al min real empírico de C1)
-            if diam < th["c1_min"]:
-                continue # Se queda en 0 (fondo)
+            # Filtro estricto: Descartar (dejar en 0) si es menor a su propio mínimo empírico
+            if c == 1 and diam < th["c1_min"]:
+                continue
+            if c == 2 and diam < th["c2_min"]:
+                continue
+            if c == 3 and diam < th["c3_min"]:
+                continue
                 
             final_class = c
             
-            # Rule 2: C1 es imposiblemente grande -> Muta a C2
+            # Regla de mutación: C1 es imposiblemente grande -> Muta a C2
             if c == 1 and diam > th["c1_max"]:
-                final_class = 2
-                
-            # Rule 3: C3 es imposiblemente chico -> Muta a C2
-            elif c == 3 and diam < th["c3_min"]:
                 final_class = 2
                 
             # Asignar la clase final a todos los píxeles de esta mancha
             cleaned_mask[labels == i] = final_class
+            
+    # Rule 4: Consolidación Física (Rellenar Agujeros)
+    # Rellenamos cualquier "agujero" (sea fondo o C1 atrapado) dentro de las masas mayores
+    for c in [2, 3]:
+        class_mask = (cleaned_mask == c).astype(np.uint8)
+        if np.sum(class_mask) == 0:
+            continue
+        contours, _ = cv2.findContours(class_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(cleaned_mask, contours, -1, c, thickness=cv2.FILLED)
             
     return cleaned_mask

@@ -33,6 +33,11 @@ def main(config_path):
             
     run_dir = runs[-1]
             
+    # Recargar la configuración desde el DNI del modelo para obtener los umbrales empíricos
+    run_config_path = os.path.join(run_dir, "config.yaml")
+    if os.path.exists(run_config_path):
+        config = load_config(run_config_path)
+            
     # Buscar el archivo del modelo
     model_path = os.path.join(run_dir, "best_model.pth")
     if not os.path.exists(model_path):
@@ -61,7 +66,9 @@ def main(config_path):
 
     for img_path in tqdm(image_paths, desc="Procesando"):
         basename = os.path.basename(img_path)
-        out_path = os.path.join(pred_dir, basename)
+        # Forzar extensión .png para la salida
+        out_basename = os.path.splitext(basename)[0] + ".png"
+        out_path = os.path.join(pred_dir, out_basename)
         
         img = cv2.imread(img_path)
         if img is None:
@@ -85,8 +92,21 @@ def main(config_path):
         pred_mask = postprocess_mask(pred_mask, basename, empirical_thresholds)
             
         color_mask = colorize_mask(pred_mask)
-        cv2.imwrite(out_path, cv2.cvtColor(color_mask, cv2.COLOR_RGB2BGR))
-
+        
+        # Redimensionar al formato estándar (ej: 1024 x 768) antes de guardar
+        color_mask_resized = cv2.resize(color_mask, (1024, 768), interpolation=cv2.INTER_NEAREST)
+        orig_resized = cv2.resize(img_rgb, (1024, 768), interpolation=cv2.INTER_AREA)
+        
+        # Aplicar Alpha Blending selectivo
+        alpha = 0.15
+        overlay = orig_resized.copy()
+        blended = cv2.addWeighted(orig_resized, 1 - alpha, color_mask_resized, alpha, 0)
+        
+        # Solo aplicamos color donde hay predicción
+        mask = np.any(color_mask_resized != [0, 0, 0], axis=-1)
+        overlay[mask] = blended[mask]
+        
+        cv2.imwrite(out_path, cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
     print(f"¡Todas las predicciones se guardaron en {pred_dir}!")
 
 if __name__ == "__main__":
