@@ -6,6 +6,29 @@ import torch
 from torch.utils.data import Dataset
 import albumentations as albu
 import random
+from segmentation_models_pytorch.encoders import get_preprocessing_fn
+
+preprocess_input = get_preprocessing_fn("resnet34", pretrained="imagenet")
+
+# Mapeo de color (BGR, como lee OpenCV) de las máscaras taggeadas a clase.
+MASK_COLOR_TO_CLASS = {
+    (0, 255, 0): 1,     # verde -> células sueltas
+    (0, 255, 255): 2,   # amarillo -> esferoides
+    (255, 255, 0): 3,   # cyan -> atípicos
+}
+
+
+def load_mask_labels(mask_path):
+    """Lee una máscara taggeada a color y la decodifica a clases 0-3 (1 canal)."""
+    img = cv2.imread(mask_path)
+    if img is None:
+        return None
+    labels = np.zeros(img.shape[:2], dtype=np.uint8)
+    for bgr, class_id in MASK_COLOR_TO_CLASS.items():
+        match = np.all(img == bgr, axis=-1)
+        labels[match] = class_id
+    return labels
+
 
 class SpheroidDataset(Dataset):
     """Dataset con crops centrados en objetos para evitar el class imbalance."""
@@ -17,8 +40,8 @@ class SpheroidDataset(Dataset):
 
         for img_path, mask_path in zip(image_paths, mask_paths):
             if not os.path.exists(mask_path): continue
-            
-            mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+
+            mask = load_mask_labels(mask_path)
             if mask is None: continue
             
             ys, xs = np.where(mask > 0)
@@ -54,7 +77,7 @@ class SpheroidDataset(Dataset):
         
         img_full = cv2.imread(img_path)
         img_full = cv2.cvtColor(img_full, cv2.COLOR_BGR2RGB)
-        mask_full = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        mask_full = load_mask_labels(mask_path)
         
         img = img_full[cy - h2:cy + h2, cx - h2:cx + h2]
         mask = mask_full[cy - h2:cy + h2, cx - h2:cx + h2]
@@ -63,7 +86,7 @@ class SpheroidDataset(Dataset):
             sample = self.augmentation(image=img, mask=mask)
             img, mask = sample["image"], sample["mask"]
             
-        img = img.astype(np.float32) / 255.0
+        img = preprocess_input(img).astype(np.float32)
         img = torch.from_numpy(img.transpose(2, 0, 1))
         mask = torch.from_numpy(mask).long()
         return img, mask
@@ -76,52 +99,122 @@ def get_augmentation():
         albu.GaussNoise(p=0.2),
         albu.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.4),
         # Descomenta abajo para transformaciones biológicas avanzadas
-        # albu.ElasticTransform(alpha=1, sigma=50, alpha_affine=50, p=0.3),
-        # albu.GaussianBlur(blur_limit=(3, 5), p=0.2), 
+        # albu.ElasticTransform(alpha=1, sigma=50, p=0.3),
+        # albu.GaussianBlur(blur_limit=(3, 5), p=0.2),
     ])
 
 def prepare_data(config):
     images_dir = config["paths"]["images_dir"]
     masks_dir = config["paths"]["masks_dir"]
-    test_basename = config["training"]["test_image_basename"]
     seed = config["training"].get("seed", 42)
-    
-    all_imgs = sorted(glob.glob(os.path.join(images_dir, "*.tiff")))
-    
-    test_img = None
-    test_mask = None
-    train_val_imgs = []
-    train_val_masks = []
-    
+
+    all_imgs = sorted(glob.glob(os.path.join(images_dir, "*.png")))
+
+    pairs = []
     for img_path in all_imgs:
-        basename = os.path.basename(img_path).replace(".tiff", "")
+        basename = os.path.basename(img_path).replace(".png", "")
         # Las máscaras no tienen el sufijo de aumento
         mask_base = basename.replace("_4x", "").replace("_10x", "")
-        mask_name = mask_base + "-Outlined.tif"
+        mask_name = mask_base + "-Mask.png"
         mask_path = os.path.join(masks_dir, mask_name)
-        
+
         if not os.path.exists(mask_path):
             continue
-            
+
+        pairs.append((img_path, mask_path))
+
+    test_fixed_basenames = config["training"].get("test_fixed_basenames")
+    test_count = config["training"].get("test_count")
+
+    if test_fixed_basenames is not None or test_count is not None:
+        # Test set chico: N imágenes fijas + relleno aleatorio hasta test_count.
+        # El resto se reparte train/val con train_split/val_split (por defecto 70/30).
+        test_fixed_basenames = test_fixed_basenames or []
+        test_count = test_count if test_count is not None else len(test_fixed_basenames)
+
+        def basename_of(pair):
+            return os.path.basename(pair[0]).replace(".png", "")
+
+        fixed_pairs = [p for p in pairs if basename_of(p) in test_fixed_basenames]
+        found_names = {basename_of(p) for p in fixed_pairs}
+        missing = [b for b in test_fixed_basenames if b not in found_names]
+        if missing:
+            raise ValueError(f"No se encontraron estas imágenes fijas de test: {missing}")
+
+        remaining_pool = [p for p in pairs if basename_of(p) not in test_fixed_basenames]
+
+        random.seed(seed)
+        random.shuffle(remaining_pool)
+
+        n_extra_test = max(0, test_count - len(fixed_pairs))
+        extra_test_pairs = remaining_pool[:n_extra_test]
+        rest_pairs = remaining_pool[n_extra_test:]
+
+        test_pairs = fixed_pairs + extra_test_pairs
+
+        rest_train_split = config["training"].get("train_split", 0.70)
+        rest_val_split = config["training"].get("val_split", 0.30)
+        total = rest_train_split + rest_val_split
+        rest_train_split, rest_val_split = rest_train_split / total, rest_val_split / total
+
+        split_idx = round(len(rest_pairs) * rest_train_split)
+        train_pairs = rest_pairs[:split_idx]
+        val_pairs = rest_pairs[split_idx:]
+
+        print(f"Total imágenes encontradas: {len(pairs)}")
+        print(f"Imágenes de Test ({len(test_pairs)}): {[basename_of(p) for p in test_pairs]}")
+        print(f"Imágenes de Entrenamiento: {len(train_pairs)} ({rest_train_split:.0%} del resto)")
+        print(f"Imágenes de Validación: {len(val_pairs)} ({rest_val_split:.0%} del resto)")
+
+        return train_pairs, val_pairs, test_pairs
+
+    train_split = config["training"].get("train_split")
+    val_split = config["training"].get("val_split")
+    test_split = config["training"].get("test_split")
+
+    if train_split is not None and val_split is not None and test_split is not None:
+        # Split proporcional en train/val/test sobre TODO el dataset
+        random.seed(seed)
+        random.shuffle(pairs)
+
+        n = len(pairs)
+        n_test = round(n * test_split)
+        n_train = round(n * train_split)
+
+        test_pairs = pairs[:n_test]
+        train_pairs = pairs[n_test:n_test + n_train]
+        val_pairs = pairs[n_test + n_train:]
+
+        print(f"Total imágenes encontradas: {n}")
+        print(f"Imágenes de Entrenamiento: {len(train_pairs)} ({train_split:.0%})")
+        print(f"Imágenes de Validación: {len(val_pairs)} ({val_split:.0%})")
+        print(f"Imágenes de Test: {len(test_pairs)} ({test_split:.0%})")
+
+        return train_pairs, val_pairs, test_pairs
+
+    # --- Modo legado: una sola imagen de test por nombre + 70/30 sobre el resto ---
+    test_basename = config["training"]["test_image_basename"]
+
+    test_img, test_mask = None, None
+    train_val_pairs = []
+    for img_path, mask_path in pairs:
+        basename = os.path.basename(img_path).replace(".png", "")
         if basename == test_basename:
-            test_img = img_path
-            test_mask = mask_path
+            test_img, test_mask = img_path, mask_path
         else:
-            train_val_imgs.append(img_path)
-            train_val_masks.append(mask_path)
-            
-    # Mezclar y separar 70/30 (con seed para reproducibilidad)
+            train_val_pairs.append((img_path, mask_path))
+
     random.seed(seed)
-    pairs = list(zip(train_val_imgs, train_val_masks))
-    random.shuffle(pairs)
-    
-    split_idx = int(len(pairs) * 0.70)
-    train_pairs = pairs[:split_idx]
-    val_pairs = pairs[split_idx:]
-    
-    print(f"Total imágenes encontradas: {len(pairs) + (1 if test_img else 0)}")
+    random.shuffle(train_val_pairs)
+
+    split_idx = int(len(train_val_pairs) * 0.70)
+    train_pairs = train_val_pairs[:split_idx]
+    val_pairs = train_val_pairs[split_idx:]
+
+    print(f"Total imágenes encontradas: {len(train_val_pairs) + (1 if test_img else 0)}")
     print(f"Imagen apartada de Test: {test_img}")
     print(f"Imágenes de Entrenamiento: {len(train_pairs)}")
     print(f"Imágenes de Validación: {len(val_pairs)}")
-    
-    return train_pairs, val_pairs, test_img, test_mask
+
+    test_pairs = [(test_img, test_mask)] if test_img else []
+    return train_pairs, val_pairs, test_pairs

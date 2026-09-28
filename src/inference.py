@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from src.config import load_config
 from src.utils import pad_image, colorize_mask, tta_inference, postprocess_mask
+from src.dataset import preprocess_input
 
 def main(config_path):
     config = load_config(config_path)
@@ -55,7 +56,7 @@ def main(config_path):
     model.to(DEVICE)
     model.eval()
 
-    image_paths = sorted(glob.glob(os.path.join(IMAGES_DIR, "*.tiff")))
+    image_paths = sorted(glob.glob(os.path.join(IMAGES_DIR, "*.png")))
     print(f"Encontradas {len(image_paths)} imágenes para procesar.")
 
     use_tta = config.get("inference", {}).get("use_tta", False)
@@ -77,7 +78,7 @@ def main(config_path):
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         padded_img, orig_h, orig_w = pad_image(img_rgb)
 
-        tensor_img = padded_img.astype(np.float32) / 255.0
+        tensor_img = preprocess_input(padded_img).astype(np.float32)
         tensor_img = torch.from_numpy(tensor_img.transpose(2, 0, 1)).unsqueeze(0).to(DEVICE)
 
         with torch.no_grad():

@@ -14,8 +14,8 @@ import shutil
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.config import load_config
-from src.dataset import SpheroidDataset, prepare_data, get_augmentation
-from src.utils import pad_image, colorize_mask, tta_inference, postprocess_mask, calculate_empirical_thresholds
+from src.dataset import SpheroidDataset, prepare_data, get_augmentation, preprocess_input
+from src.utils import pad_image, colorize_mask, tta_inference, postprocess_mask, calculate_empirical_thresholds, generate_comparison_collage
 
 def run_inference(model, test_img_path, config, device, model_name):
     print("\n--- EJECUTANDO INFERENCIA EN IMAGEN DE TEST ---")
@@ -32,7 +32,7 @@ def run_inference(model, test_img_path, config, device, model_name):
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     padded_img, orig_h, orig_w = pad_image(img_rgb)
     
-    tensor_img = padded_img.astype(np.float32) / 255.0
+    tensor_img = preprocess_input(padded_img).astype(np.float32)
     tensor_img = torch.from_numpy(tensor_img.transpose(2, 0, 1)).unsqueeze(0).to(device)
     
     with torch.no_grad():
@@ -72,7 +72,7 @@ def train_model(config_path):
     config["inference"]["empirical_thresholds"] = empirical_th
     print("Umbrales empíricos inyectados en la configuración (DNI).")
     
-    train_pairs, val_pairs, test_img, test_mask = prepare_data(config)
+    train_pairs, val_pairs, test_pairs = prepare_data(config)
     
     # --- Dataset & DataLoader ---
     train_dataset = SpheroidDataset(
@@ -198,8 +198,20 @@ def train_model(config_path):
         f.write(f"Mejor Val Loss: {best_val_loss:.4f}\n")
         f.write(f"Val IoU en ese punto: {best_val_iou:.4f}\n")
     
-    if test_img:
+    for test_img, _ in test_pairs:
         run_inference(model, test_img, config, device, model_name)
+
+    print("\n--- GENERANDO COLLAGES DE COMPARACIÓN (Original | Ground Truth | Predicción) ---")
+    pred_dir = os.path.join(config["paths"]["output_dir"], "predictions", model_name)
+    comparisons_dir = os.path.join(config["paths"]["output_dir"], "comparisons", model_name)
+    os.makedirs(comparisons_dir, exist_ok=True)
+
+    for test_img, gt_mask_path in test_pairs:
+        basename = os.path.splitext(os.path.basename(test_img))[0]
+        pred_color_path = os.path.join(pred_dir, os.path.basename(test_img))
+        out_path = os.path.join(comparisons_dir, f"{basename}_collage.jpg")
+        ok = generate_comparison_collage(test_img, gt_mask_path, pred_color_path, out_path)
+        print(f"  [{'OK' if ok else 'ERROR'}] {basename} -> {out_path}")
 
 if __name__ == "__main__":
     import argparse

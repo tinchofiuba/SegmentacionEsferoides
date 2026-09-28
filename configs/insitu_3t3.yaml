@@ -1,0 +1,20 @@
+paths:
+  images_dir: "/media/martin/D/ImgCrudas"
+  masks_dir: "/media/martin/D/ImgTaggeadas"
+  output_dir: "/home/martin/repos/SegmentacionEsferoides/outputs"
+
+training:
+  epochs: 40
+  batch_size: 4
+  learning_rate: 0.0001
+  crop_size: 512
+  num_classes: 4
+  patches_per_image: 16
+  train_split: 0.60
+  val_split: 0.30
+  test_split: 0.10
+  seed: 42
+
+inference:
+  use_tta: true
+  morphology_kernel_size: 5

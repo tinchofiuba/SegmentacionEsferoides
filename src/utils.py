@@ -19,6 +19,54 @@ def colorize_mask(mask):
     color_img[mask == 3] = (255, 255, 255)  # Blanco -> 3
     return color_img
 
+COLLAGE_PANEL_SIZE = (1024, 760)  # (ancho, alto) por panel
+COLLAGE_ALPHA = 0.5
+COLLAGE_LABELS = ["Original", "Ground Truth", "Prediccion"]
+
+
+def _overlay_colored_mask(base_bgr, color_mask_rgb, alpha=COLLAGE_ALPHA):
+    """Superpone color_mask_rgb (RGB, de colorize_mask) sobre base_bgr solo donde hay clase."""
+    color_mask_bgr = cv2.cvtColor(color_mask_rgb, cv2.COLOR_RGB2BGR)
+    blended = cv2.addWeighted(base_bgr, 1 - alpha, color_mask_bgr, alpha, 0)
+    has_class = np.any(color_mask_rgb != 0, axis=-1)
+    result = base_bgr.copy()
+    result[has_class] = blended[has_class]
+    return result
+
+
+def _add_label(img, text):
+    img = img.copy()
+    cv2.putText(img, text, (16, 36), cv2.FONT_HERSHEY_SIMPLEX, 1.1, (0, 0, 0), 5, cv2.LINE_AA)
+    cv2.putText(img, text, (16, 36), cv2.FONT_HERSHEY_SIMPLEX, 1.1, (255, 255, 255), 2, cv2.LINE_AA)
+    return img
+
+
+def generate_comparison_collage(img_path, gt_mask_path, pred_color_path, out_path):
+    """Collage de 3 paneles (Original | Ground Truth | Prediccion) con overlay al 50%."""
+    original = cv2.imread(img_path)
+    pred_color_full = cv2.imread(pred_color_path)
+    gt_labels_full = cv2.imread(gt_mask_path, cv2.IMREAD_GRAYSCALE)
+
+    if original is None or pred_color_full is None or gt_labels_full is None:
+        return False
+
+    original_small = cv2.resize(original, COLLAGE_PANEL_SIZE, interpolation=cv2.INTER_AREA)
+    pred_color_small_rgb = cv2.cvtColor(
+        cv2.resize(pred_color_full, COLLAGE_PANEL_SIZE, interpolation=cv2.INTER_NEAREST),
+        cv2.COLOR_BGR2RGB,
+    )
+    gt_labels_small = cv2.resize(gt_labels_full, COLLAGE_PANEL_SIZE, interpolation=cv2.INTER_NEAREST)
+    gt_color_small_rgb = colorize_mask(gt_labels_small)
+
+    panel_original = _add_label(original_small, COLLAGE_LABELS[0])
+    panel_gt = _add_label(_overlay_colored_mask(original_small, gt_color_small_rgb), COLLAGE_LABELS[1])
+    panel_pred = _add_label(_overlay_colored_mask(original_small, pred_color_small_rgb), COLLAGE_LABELS[2])
+
+    collage = cv2.hconcat([panel_original, panel_gt, panel_pred])
+    cv2.imwrite(out_path, collage, [cv2.IMWRITE_JPEG_QUALITY, 90])
+    return True
+
+
 def tta_inference(model, tensor_img):
     """Realiza Test-Time Augmentation (4 vistas) y promedia los logits."""
     # 1. Normal
@@ -45,24 +93,25 @@ def calculate_empirical_thresholds(config):
     """
     import glob
     import os
-    
+    from src.dataset import load_mask_labels
+
     images_dir = config["paths"]["images_dir"]
     masks_dir = config["paths"]["masks_dir"]
-    all_imgs = sorted(glob.glob(os.path.join(images_dir, "*.tiff")))
-    
+    all_imgs = sorted(glob.glob(os.path.join(images_dir, "*.png")))
+
     diams_4x = {1: [], 2: [], 3: []}
     diams_10x = {1: [], 2: [], 3: []}
-    
+
     for img_path in all_imgs:
-        basename = os.path.basename(img_path).replace(".tiff", "")
+        basename = os.path.basename(img_path).replace(".png", "")
         mask_base = basename.replace("_4x", "").replace("_10x", "")
-        mask_name = mask_base + "-Outlined.tif"
+        mask_name = mask_base + "-Mask.png"
         mask_path = os.path.join(masks_dir, mask_name)
-        
+
         if not os.path.exists(mask_path):
             continue
-            
-        mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+
+        mask = load_mask_labels(mask_path)
         if mask is None:
             continue
             
