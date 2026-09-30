@@ -17,11 +17,11 @@ from src.config import load_config
 from src.dataset import SpheroidDataset, prepare_data, get_augmentation, preprocess_input
 from src.utils import pad_image, colorize_mask, tta_inference, postprocess_mask, calculate_empirical_thresholds, generate_comparison_collage
 
-def run_inference(model, test_img_path, config, device, model_name):
+def run_inference(model, test_img_path, config, device, run_name):
     print("\n--- EJECUTANDO INFERENCIA EN IMAGEN DE TEST ---")
     model.eval()
     basename = os.path.basename(test_img_path)
-    pred_dir = os.path.join(config["paths"]["output_dir"], "predictions", model_name)
+    pred_dir = os.path.join(config["paths"]["output_dir"], "predictions", run_name)
     os.makedirs(pred_dir, exist_ok=True)
     
     img = cv2.imread(test_img_path)
@@ -104,7 +104,11 @@ def train_model(config_path):
         return 0.5 * focal_loss(logits, targets) + 0.5 * dice_loss(logits, targets)
     
     optimizer = torch.optim.AdamW(model.parameters(), lr=config["training"]["learning_rate"])
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=config["training"]["epochs"])
+    lr_patience = config["training"].get("lr_patience", 5)
+    lr_factor = config["training"].get("lr_factor", 0.5)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode="max", factor=lr_factor, patience=lr_patience, min_lr=1e-6
+    )
     
     best_val_loss = float("inf")
     best_val_iou = 0.0
@@ -122,6 +126,7 @@ def train_model(config_path):
             counter += 1
         run_dir = f"{run_dir} ({counter})"
     os.makedirs(run_dir)
+    run_name = os.path.basename(run_dir)
     
     # Guardar receta DNI
     import yaml
@@ -157,7 +162,6 @@ def train_model(config_path):
                 
                 tepoch.set_postfix(loss=loss.item(), iou=iou.item())
                 
-        scheduler.step()
         avg_train_loss = train_loss / len(train_loader)
         avg_train_iou = train_iou / len(train_loader)
         
@@ -181,8 +185,11 @@ def train_model(config_path):
                 
         avg_val_loss = val_loss / len(val_loader)
         avg_val_iou = val_iou / len(val_loader)
-        print(f"Epoch {epoch+1} | Train Loss: {avg_train_loss:.4f} (IoU: {avg_train_iou:.4f}) | Val Loss: {avg_val_loss:.4f} (IoU: {avg_val_iou:.4f})")
-        
+        current_lr = optimizer.param_groups[0]["lr"]
+        print(f"Epoch {epoch+1} | Train Loss: {avg_train_loss:.4f} (IoU: {avg_train_iou:.4f}) | Val Loss: {avg_val_loss:.4f} (IoU: {avg_val_iou:.4f}) | LR: {current_lr:.2e}")
+
+        scheduler.step(avg_val_iou)
+
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
             best_val_iou = avg_val_iou
@@ -199,11 +206,11 @@ def train_model(config_path):
         f.write(f"Val IoU en ese punto: {best_val_iou:.4f}\n")
     
     for test_img, _ in test_pairs:
-        run_inference(model, test_img, config, device, model_name)
+        run_inference(model, test_img, config, device, run_name)
 
     print("\n--- GENERANDO COLLAGES DE COMPARACIÓN (Original | Ground Truth | Predicción) ---")
-    pred_dir = os.path.join(config["paths"]["output_dir"], "predictions", model_name)
-    comparisons_dir = os.path.join(config["paths"]["output_dir"], "comparisons", model_name)
+    pred_dir = os.path.join(config["paths"]["output_dir"], "predictions", run_name)
+    comparisons_dir = os.path.join(config["paths"]["output_dir"], "comparisons", run_name)
     os.makedirs(comparisons_dir, exist_ok=True)
 
     for test_img, gt_mask_path in test_pairs:

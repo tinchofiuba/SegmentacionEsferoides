@@ -43,9 +43,11 @@ def _add_label(img, text):
 
 def generate_comparison_collage(img_path, gt_mask_path, pred_color_path, out_path):
     """Collage de 3 paneles (Original | Ground Truth | Prediccion) con overlay al 50%."""
+    from src.dataset import load_mask_labels
+
     original = cv2.imread(img_path)
     pred_color_full = cv2.imread(pred_color_path)
-    gt_labels_full = cv2.imread(gt_mask_path, cv2.IMREAD_GRAYSCALE)
+    gt_labels_full = load_mask_labels(gt_mask_path)
 
     if original is None or pred_color_full is None or gt_labels_full is None:
         return False
