@@ -45,11 +45,9 @@ select = ["E", "F", "I", "W", "UP", "B", "C4"]
 # tocar estas líneas significaría reescribir lógica de scripts/modelo en vez de
 # solo reorganizar. Quedan documentadas en docs/status.md como deuda pendiente.
 ignore = [
-    "E501",  # líneas largas en scripts/dataset.py preexistentes (ver docs/status.md)
-    "E701",  # `if x: continue` en una línea, estilo preexistente en dataset.py y scripts/
-    "E722",  # bare except en scripts/legacy_debug/evaluate_metrics.py (script roto, ver docs/status.md)
-    "B905",  # zip() sin strict= en dataset.py y scripts/analysis/*
-    "B007",  # loop var sin usar en scripts/legacy_debug/test_cytation5.py
+    "E501",  # líneas largas preexistentes en dataset.py/train.py/inference.py/utils.py
+    "E701",  # `if x: continue` en una línea, estilo preexistente en dataset.py
+    "B905",  # zip() sin strict= en dataset.py
 ]
 
 [tool.pytest.ini_options]

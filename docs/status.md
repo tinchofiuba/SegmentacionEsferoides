@@ -19,7 +19,8 @@ lógica de modelo/entrenamiento).
 | Post-procesado empírico | OK, bajo revisión | Filtra blobs por percentil 5/95 de diámetro (por clase, por aumento 4x/10x) y muta C1→C2 si es demasiado grande; ver pendiente #4 abajo |
 | Inferencia | OK | TTA opcional (4 vistas, flips), stitching NO implementado (una sola pasada sobre la imagen completa, con padding a múltiplo de 32) |
 | Collages de comparación | OK | Original / Ground Truth / Predicción, 3 paneles |
-| Tests | Reescritos | `tests/` ahora tiene tests reales con fixtures sintéticas (antes: 0 asserts reales, scripts de debug con paths hardcodeados — movidos a `scripts/legacy_debug/`) |
+| Tests | Reescritos | `tests/` ahora tiene tests reales con fixtures sintéticas (antes: 0 asserts reales) |
+| Scripts | Podados | Se borraron 19 scripts de debug/diagnóstico que apuntaban a datasets/runs ya inexistentes (ver "Limpieza de scripts" abajo); quedan solo `data_prep/prepare_insitu_dataset.py` y `viz/{generate_comparison_images,regenerate_comparisons}.py` |
 | CI | Pendiente | `.github/workflows/ci.yml` con lint + pytest |
 | Empaquetado | OK | `src/u_resnet_segesferoides/` instalable vía uv, entry points `u-resnet-train` / `u-resnet-infer` |
 
@@ -89,11 +90,37 @@ originales.
 - `encoder_name` sigue hardcodeado a `"resnet34"` en `train.py` e
   `inference.py` (el experimento EfficientNet-B0 que lo parametrizaba no
   llegó a mergearse acá).
-- `scripts/legacy_debug/` tiene 6 scripts que no corren tal cual (importan
-  un módulo `train_unet` que ya no existe, o hardcodean datasets borrados).
-  Se conservan como referencia pero no están cubiertos por tests ni CI.
 - Excepciones de ruff documentadas en `pyproject.toml`
-  (`[tool.ruff.lint] ignore`) sobre código heredado: líneas largas,
-  `if x: continue` en una línea, un `except:` desnudo y un `zip()` sin
-  `strict=` — no se tocaron para no mezclar limpieza de estilo con el
-  refactor de estructura.
+  (`[tool.ruff.lint] ignore`) sobre código heredado en `dataset.py`: líneas
+  largas y `if x: continue` en una línea — no se tocaron para no mezclar
+  limpieza de estilo con el refactor de estructura.
+
+## Limpieza de scripts (2026-10-02)
+
+Se revisaron a fondo los 20 scripts que había en `scripts/` (más los 6 que
+vivían mal ubicados en `tests/`/raíz) y se borraron 19 por estar
+confirmadamente muertos — ninguno quedó con lógica rescatable que no esté ya
+en el paquete:
+
+- Apuntaban a `inputsConvertidas/0_1_2_3`/`ConColores` o a
+  `/home/martin/Descargas/drive-download-*`, directorios que ya no existen
+  en disco (`analyze_areas.py`, `check_ground_truth.py`, `find_3_classes.py`,
+  `convert_masks.py`, `visualize_mask.py`, `convert_jpg_to_tiff.py`,
+  `extract_3t3_masks.py`, `diagnose.py`).
+- Apuntaban a predicciones/runs de la convención vieja
+  (`pred_3classes_*`, `outputs/predictions/default/`, run
+  `default_2026-08-20`), ya inexistentes (`analyze_prediction.py`,
+  `check_diameters.py`, `investigate_holes.py`, `test_inference_single.py` —
+  este último además duplicaba `u-resnet-infer`).
+- `make_collage.py`: sus 3 inputs estaban muertos y el output apuntaba a una
+  carpeta de otra herramienta de IA (`~/.gemini/antigravity/...`), ajena al
+  repo. La función que cumplía (`generate_comparison_collage`) ya corre
+  automáticamente en cada training.
+- `eval_huge_images.py`: archivo vacío (0 bytes).
+- Los 6 de `tests/` que importaban `train_unet` (módulo de una arquitectura
+  pre-refactor que ya no existe) o duplicaban `pad_image`/`colorize_mask` en
+  vez de importarlos de `utils.py`.
+
+Quedan solo `scripts/data_prep/prepare_insitu_dataset.py` y
+`scripts/viz/{generate_comparison_images,regenerate_comparisons}.py`, los
+tres parametrizados por `--config` y vigentes contra el dataset activo.

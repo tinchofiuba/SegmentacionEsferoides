@@ -73,15 +73,14 @@ histórica, no como algo a correr.
 
 ## Scripts
 
-`scripts/` está organizado por propósito:
-- `data_prep/`: conversión y preparación de datasets.
-- `analysis/`: diagnóstico puntual sobre máscaras/predicciones.
-- `viz/`: collages y overlays de comparación.
-- `eval/`: evaluación de checkpoints ya entrenados.
-- `legacy_debug/`: scripts y "tests" viejos pre-refactor que ya no corren
-  (dependen de un módulo `train_unet` que no existe, o de datasets que ya no
-  están en disco). Se conservan como referencia, no se ejecutan ni se
-  mantienen.
+`scripts/` quedó reducido a lo vigente (se borraron 19 scripts de
+debug/diagnóstico puntual que apuntaban a datasets/runs que ya no existen en
+disco, o duplicaban lo que ya hace `u-resnet-train`/`u-resnet-infer` — ver
+`docs/status.md`):
+- `data_prep/prepare_insitu_dataset.py`: convierte `ImgCrudas`/`ImgTaggeadas`
+  al formato que espera `SpheroidDataset`.
+- `viz/generate_comparison_images.py`, `viz/regenerate_comparisons.py`:
+  collages de comparación sobre un modelo ya entrenado, sin reentrenar.
 
 ## Reportes de experimentos
 
