@@ -12,7 +12,7 @@ lógica de modelo/entrenamiento).
 
 | Módulo | Estado | Notas |
 |---|---|---|
-| Pipeline de datos | OK | `SpheroidDataset` con crops de 512px centrados en objetos (80% sobre objeto / 20% random); normalización ImageNet |
+| Pipeline de datos | OK | `SpheroidDataset` con crops de 512px centrados en objetos (80% sobre objeto / 20% random); normalización ImageNet; split train/val/test materializado en `splits/insitu_3t3/*.txt` (antes: recalculado con seed+shuffle en cada corrida) |
 | Modelo | OK | U-Net (segmentation-models-pytorch) con backbone ResNet34 (baseline); experimento con EfficientNet-B0 iniciado en rama `eff_backbone` (ver abajo) |
 | Loss | OK | Focal (γ=2.0) + Dice, combinadas 50/50 |
 | Entrenamiento | OK | AdamW + ReduceLROnPlateau (monitorea val_iou), checkpoint por mejor val_loss |
@@ -69,6 +69,18 @@ hardcodeado a `"resnet34"`) y el `configs/insitu_3t3_effnet.yaml` correspondient
    perdidos, bordes imprecisos).
 6. Backbone más grande / arquitectura distinta, `ReduceLROnPlateau` con más
    paciencia, más épocas — si el resto no alcanza.
+
+## Pendiente de decisión: formato de máscara vs. spheroid-seg
+
+Las máscaras de este repo son PNG a color (verde/amarillo/cyan sobre negro,
+decodificadas por `MASK_COLOR_TO_CLASS` en `dataset.py`). `spheroid-seg` usa
+máscaras de 1 canal en escala de grises con el valor de píxel = id de clase
+(0-3), formato más estándar y liviano. El mapeo de clases coincide 1 a 1
+entre ambos repos, así que es una diferencia solo de codificación, no
+semántica. Diferido a propósito: decidir si (a) se convierten las 96
+máscaras físicas en `/media/martin/D/ImgTaggeadas` a grayscale, o (b)
+`load_mask_labels` pasa a soportar ambos formatos sin tocar los archivos
+originales.
 
 ## Deuda de ingeniería conocida (no bloqueante)
 

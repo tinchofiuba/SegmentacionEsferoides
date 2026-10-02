@@ -124,6 +124,41 @@ def prepare_data(config):
 
         pairs.append((img_path, mask_path))
 
+    splits_dir = config["paths"].get("splits_dir")
+    if splits_dir is not None:
+        # Splits materializados (listas de basenames versionadas en archivo,
+        # ver splits/<dataset>/{train,val,test}.txt) en vez de recalcularlos
+        # con seed+shuffle en cada corrida. Tiene prioridad sobre el resto de
+        # las estrategias de split de esta función.
+        def basename_of(pair):
+            return os.path.basename(pair[0]).replace(".png", "")
+
+        pairs_by_basename = {basename_of(p): p for p in pairs}
+
+        def load_split_file(split_name):
+            split_path = os.path.join(splits_dir, f"{split_name}.txt")
+            with open(split_path) as f:
+                names = [line.strip() for line in f if line.strip()]
+            missing = [n for n in names if n not in pairs_by_basename]
+            if missing:
+                raise ValueError(
+                    f"No se encontraron estas imágenes del split '{split_name}' "
+                    f"({split_path}): {missing}"
+                )
+            return [pairs_by_basename[n] for n in names]
+
+        train_pairs = load_split_file("train")
+        val_pairs = load_split_file("val")
+        test_pairs = load_split_file("test")
+
+        print(f"Total imágenes encontradas: {len(pairs)}")
+        print(f"Splits cargados desde {splits_dir}")
+        print(f"Imágenes de Entrenamiento: {len(train_pairs)}")
+        print(f"Imágenes de Validación: {len(val_pairs)}")
+        print(f"Imágenes de Test: {len(test_pairs)}")
+
+        return train_pairs, val_pairs, test_pairs
+
     test_fixed_basenames = config["training"].get("test_fixed_basenames")
     test_count = config["training"].get("test_count")
 

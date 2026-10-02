@@ -2,6 +2,10 @@ paths:
   images_dir: "data/insitu_3t3/raw"
   masks_dir: "data/insitu_3t3/masks"
   output_dir: "outputs"
+  # Split materializado (mismo reparto que daba seed=42 + train/val/test_split
+  # de abajo sobre las 96 imágenes actuales) — ver splits/insitu_3t3/*.txt.
+  # Tiene prioridad sobre train_split/val_split/test_split.
+  splits_dir: "splits/insitu_3t3"
 
 training:
   epochs: 40

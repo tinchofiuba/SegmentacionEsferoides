@@ -52,6 +52,13 @@ histórica, no como algo a correr.
 
 - Los hiperparámetros (crop_size, batch_size, lr, splits, etc.) viven
   **únicamente** en `configs/*.yaml`. No hardcodear valores en el código.
+- Splits reproducibles: si un config define `paths.splits_dir`, el split
+  train/val/test se lee de `<splits_dir>/{train,val,test}.txt` (listas de
+  basenames, versionadas en git) en vez de recalcularse con `seed` + shuffle
+  en cada corrida — así no cambia si el dataset crece. Ver
+  `splits/insitu_3t3/` para el ejemplo vigente. `train_split`/`val_split`/
+  `test_split`/`seed` quedan como fallback para configs que no usan
+  `splits_dir` (p. ej. `configs/default.yaml`, legacy).
 - Mapeo de color de máscaras (fijo, no cambiar sin actualizar todo el
   pipeline): verde=1 (células sueltas), amarillo=2 (esferoides), cyan=3
   (atípicos) — ver `MASK_COLOR_TO_CLASS` en `dataset.py`.
