@@ -1,7 +1,7 @@
 [project]
-name = "segmentacionesferoides"
+name = "u-resnet-segesferoides"
 version = "0.1.0"
-description = "Add your description here"
+description = "Segmentacion de esferoides y celulas sueltas en imagenes de microscopia (U-Net + ResNet34/EfficientNet-B0, PyTorch)."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -17,3 +17,40 @@ dependencies = [
     "torchvision>=0.28.0",
     "tqdm>=4.70.0",
 ]
+
+[project.scripts]
+u-resnet-train = "u_resnet_segesferoides.train:main"
+u-resnet-infer = "u_resnet_segesferoides.inference:main"
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/u_resnet_segesferoides"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B", "C4"]
+# Excepciones deliberadas sobre código heredado (pre-refactor de estructura):
+# tocar estas líneas significaría reescribir lógica de scripts/modelo en vez de
+# solo reorganizar. Quedan documentadas en docs/status.md como deuda pendiente.
+ignore = [
+    "E501",  # líneas largas en scripts/dataset.py preexistentes (ver docs/status.md)
+    "E701",  # `if x: continue` en una línea, estilo preexistente en dataset.py y scripts/
+    "E722",  # bare except en scripts/legacy_debug/evaluate_metrics.py (script roto, ver docs/status.md)
+    "B905",  # zip() sin strict= en dataset.py y scripts/analysis/*
+    "B007",  # loop var sin usar en scripts/legacy_debug/test_cytation5.py
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

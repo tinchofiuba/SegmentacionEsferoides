@@ -1,3 +1,7 @@
+# LEGACY: dataset original de la primera ronda de experimentos. El directorio
+# de Descargas y inputsConvertidas/0_1_2_3 ya no existen en disco (ver
+# docs/status.md). Se mantiene el archivo como referencia histórica; el
+# dataset vigente es configs/insitu_3t3.yaml.
 paths:
   images_dir: "/home/martin/Descargas/drive-download-20260811T151259Z-1-001"
   masks_dir: "/home/martin/repos/SegmentacionEsferoides/inputsConvertidas/0_1_2_3"

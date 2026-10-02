@@ -220,7 +220,10 @@ __marimo__/
 
 # Datos pesados locales (No subir a GitHub)
 inputsConvertidas/
-outputs/
+data/
+outputs/*
+!outputs/reports/
+!outputs/reports/**
 Resultados_3T3/
 Resultados_Test_Final/
 *.tiff
