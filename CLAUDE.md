@@ -106,7 +106,7 @@ una zona marcada con un recuadro arrastrable. Separación Model/View:
   la ventana (todo se edita en coordenadas nativas), se conserva con su test.
 - `app/image_canvas.py`, `app/main_window.py`, `app/main.py`: la View.
   Controles: rueda = zoom, botón derecho/central = mover, `[` `]` = tamaño de
-  la herramienta, F = ajustar. "Aceptar" (Ctrl+S) guarda `<img>-Mask.png` +
+  la herramienta, F = ajustar. "Aceptar" (Ctrl+S) guarda `<img>_Taggeada.png` +
   `.origin.json` (manual / modelo / modelo_corregido).
 
 Instalar y correr (como módulo, con `-m` — correrlo como script suelto,

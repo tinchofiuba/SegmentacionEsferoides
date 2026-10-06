@@ -362,7 +362,7 @@ class MainWindow(QMainWindow):
         stem = os.path.splitext(os.path.basename(self.image_path))[0]
         default_dir = MASKS_DIR if os.path.isdir(MASKS_DIR) else os.path.dirname(self.image_path)
         path, _ = QFileDialog.getSaveFileName(
-            self, "Guardar máscara", os.path.join(default_dir, f"{stem}-Mask.png"), "PNG (*.png)"
+            self, "Guardar máscara", os.path.join(default_dir, f"{stem}_Taggeada.png"), "PNG (*.png)"
         )
         if not path:
             return
