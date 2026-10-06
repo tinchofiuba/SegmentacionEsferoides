@@ -82,6 +82,43 @@ disco, o duplicaban lo que ya hace `u-resnet-train`/`u-resnet-infer` — ver
 - `viz/generate_comparison_images.py`, `viz/regenerate_comparisons.py`:
   collages de comparación sobre un modelo ya entrenado, sin reentrenar.
 
+## App de escritorio (predicción por zona)
+
+`app/` (fuera de `src/`, no se empaqueta — es una app consumidora del
+paquete, no parte del "cerebro") expone una ventana PyQt5 para importar una
+imagen, verla achicada en pantalla, y predecir sobre toda la imagen o sobre
+una zona marcada con un recuadro arrastrable. Separación Model/View:
+
+- `app/model.py`: `SegmentationModel` — sin ningún import de PyQt5, envuelve
+  un run entrenado (`config.yaml` + `best_model.pth`) y expone
+  `predict(image_rgb, magnification, bbox=None)`. Reusa `pad_image`,
+  `preprocess_input`, `tta_inference`, `postprocess_mask`, `colorize_mask`
+  del paquete — cero lógica de modelo duplicada. **Si hay `bbox`, recorta
+  ANTES de inferir** (preserva la escala en píxeles; nunca se reescala la
+  imagen antes de pasarla al modelo).
+- `app/editing.py`: edición de máscaras pura (pincel/borrador en trazos
+  continuos, borrar/reasignar objeto por flood fill, rellenar huecos, undo,
+  guardado en los colores de `ImgTaggeadas`). Tests en `tests/test_app_editing.py`.
+- `app/viewport.py`: matemática y render de zoom/pan (recorta solo la región
+  visible a resolución nativa; pirámide para zooms bajos). Tests en
+  `tests/test_app_viewport.py`.
+- `app/geometry.py`: mapeo preview↔nativa de la primera versión; ya no lo usa
+  la ventana (todo se edita en coordenadas nativas), se conserva con su test.
+- `app/image_canvas.py`, `app/main_window.py`, `app/main.py`: la View.
+  Controles: rueda = zoom, botón derecho/central = mover, `[` `]` = tamaño de
+  la herramienta, F = ajustar. "Aceptar" (Ctrl+S) guarda `<img>-Mask.png` +
+  `.origin.json` (manual / modelo / modelo_corregido).
+
+Instalar y correr (como módulo, con `-m` — correrlo como script suelto,
+`python app/main.py`, falla con `ModuleNotFoundError: No module named 'app'`
+porque Python agrega `app/` a `sys.path` en vez de la raíz del repo):
+```bash
+uv sync --extra app
+uv run python -m app.main --output-dir outputs --model-name insitu_3t3
+```
+Carga el run más reciente que matchee `<model-name>_<fecha>` (vía
+`find_latest_run_dir` en `utils.py`, reusada también por `u-resnet-infer`).
+
 ## Reportes de experimentos
 
 Al terminar un experimento relevante (cambio de backbone, de augmentation,

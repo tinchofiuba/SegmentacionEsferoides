@@ -22,6 +22,9 @@ dependencies = [
 u-resnet-train = "u_resnet_segesferoides.train:main"
 u-resnet-infer = "u_resnet_segesferoides.inference:main"
 
+[project.optional-dependencies]
+app = ["PyQt5>=5.15"]
+
 [dependency-groups]
 dev = [
     "pytest",
@@ -52,3 +55,5 @@ ignore = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# "." para poder importar app/ en los tests (no es parte del paquete instalado).
+pythonpath = ["."]

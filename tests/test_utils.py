@@ -1,6 +1,51 @@
-import numpy as np
+import os
 
-from u_resnet_segesferoides.utils import colorize_mask, pad_image, postprocess_mask
+import numpy as np
+import pytest
+
+from u_resnet_segesferoides.utils import (
+    colorize_mask,
+    find_latest_run_dir,
+    pad_image,
+    postprocess_mask,
+)
+
+
+def test_find_latest_run_dir_picks_most_recent_by_name(tmp_path):
+    for name in ["insitu_3t3_2026-09-21", "insitu_3t3_2026-09-28", "insitu_3t3_2026-10-02"]:
+        (tmp_path / name).mkdir()
+    (tmp_path / "otro_modelo_2026-10-05").mkdir()
+
+    result = find_latest_run_dir(str(tmp_path), "insitu_3t3")
+
+    assert os.path.basename(result) == "insitu_3t3_2026-10-02"
+
+
+def test_find_latest_run_dir_does_not_match_other_experiment_with_same_prefix(tmp_path):
+    # "insitu_3t3_effnet_..." empieza igual que "insitu_3t3_" y alfabéticamente
+    # queda después de cualquier fecha 2026-*, así que un glob ingenuo lo
+    # confundiría con "el run más nuevo de insitu_3t3".
+    (tmp_path / "insitu_3t3_2026-09-28").mkdir()
+    (tmp_path / "insitu_3t3_2026-10-02").mkdir()
+    (tmp_path / "insitu_3t3_effnet_2026-09-30").mkdir()
+
+    result = find_latest_run_dir(str(tmp_path), "insitu_3t3")
+
+    assert os.path.basename(result) == "insitu_3t3_2026-10-02"
+
+
+def test_find_latest_run_dir_falls_back_to_run_prefix(tmp_path):
+    (tmp_path / "run_0001").mkdir()
+    (tmp_path / "run_0002").mkdir()
+
+    result = find_latest_run_dir(str(tmp_path), "insitu_3t3")
+
+    assert os.path.basename(result) == "run_0002"
+
+
+def test_find_latest_run_dir_raises_when_nothing_matches(tmp_path):
+    with pytest.raises(FileNotFoundError, match="insitu_3t3"):
+        find_latest_run_dir(str(tmp_path), "insitu_3t3")
 
 
 def test_pad_image_pads_to_multiple_of_32():

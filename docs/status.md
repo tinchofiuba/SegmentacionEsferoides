@@ -23,6 +23,7 @@ lógica de modelo/entrenamiento).
 | Scripts | Podados | Se borraron 19 scripts de debug/diagnóstico que apuntaban a datasets/runs ya inexistentes (ver "Limpieza de scripts" abajo); quedan solo `data_prep/prepare_insitu_dataset.py` y `viz/{generate_comparison_images,regenerate_comparisons}.py` |
 | CI | Pendiente | `.github/workflows/ci.yml` con lint + pytest |
 | Empaquetado | OK | `src/u_resnet_segesferoides/` instalable vía uv, entry points `u-resnet-train` / `u-resnet-infer` |
+| App de escritorio | OK (v1) | `app/` (PyQt5, extra opcional `uv sync --extra app`): predicción sobre toda la imagen o sobre una zona recortada a resolución nativa. Separación Model (`app/model.py`, sin Qt)/View. Ver "App de escritorio" en `CLAUDE.md` |
 
 ## Baseline conocido
 
@@ -94,6 +95,18 @@ originales.
   (`[tool.ruff.lint] ignore`) sobre código heredado en `dataset.py`: líneas
   largas y `if x: continue` en una línea — no se tocaron para no mezclar
   limpieza de estilo con el refactor de estructura.
+
+## Bug encontrado y corregido (2026-10-05): resolución de "último run" ambigua
+
+`find_latest_run_dir(model_name)` (usado por `u-resnet-infer` y por
+`app/model.py`) hacía `glob("<model_name>_*")` — eso también matcheaba
+variantes de experimento con el mismo prefijo, ej. buscar `"insitu_3t3"`
+matcheaba también `insitu_3t3_effnet_2026-09-30`, y por orden alfabético
+("effnet" > cualquier fecha "2026-...") la tomaba como "la más nueva",
+cargando pesos de EfficientNet-B0 en una arquitectura `smp.Unet(resnet34)`
+→ `RuntimeError` de shape mismatch. Corregido exigiendo que lo que sigue a
+`<model_name>_` sea un dígito; regresión cubierta en
+`tests/test_utils.py::test_find_latest_run_dir_does_not_match_other_experiment_with_same_prefix`.
 
 ## Limpieza de scripts (2026-10-02)
 

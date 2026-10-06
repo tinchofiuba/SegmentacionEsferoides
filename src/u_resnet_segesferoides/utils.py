@@ -1,6 +1,32 @@
+import glob
+import os
+import re
+
 import cv2
 import numpy as np
 import torch
+
+
+def find_latest_run_dir(output_base_dir, model_name):
+    """Devuelve la carpeta de run más reciente para `model_name` (orden lexicográfico
+    de nombre de carpeta: <model_name>_<fecha>, así que el último match es el más
+    nuevo). Prueba primero el formato <model_name>_<fecha...>, y si no hay nada cae
+    al formato viejo run_*. Levanta FileNotFoundError si no encuentra ninguno.
+
+    El filtro exige que lo que sigue a "<model_name>_" sea un dígito (fecha), para
+    no matchear accidentalmente una variante de experimento con el mismo prefijo
+    (ej. "insitu_3t3_effnet_2026-09-30" al buscar "insitu_3t3").
+    """
+    name_pattern = re.compile(rf"^{re.escape(model_name)}_\d")
+    candidates = glob.glob(os.path.join(output_base_dir, f"{model_name}_*"))
+    runs = sorted(r for r in candidates if name_pattern.match(os.path.basename(r)))
+    if not runs:
+        runs = sorted(glob.glob(os.path.join(output_base_dir, "run_*")))
+        if not runs:
+            raise FileNotFoundError(
+                f"No se encontró ningún entrenamiento previo para el modelo '{model_name}'"
+            )
+    return runs[-1]
 
 
 def pad_image(img):

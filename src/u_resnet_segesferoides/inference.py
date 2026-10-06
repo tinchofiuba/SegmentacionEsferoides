@@ -10,7 +10,13 @@ from tqdm import tqdm
 
 from u_resnet_segesferoides.config import load_config
 from u_resnet_segesferoides.dataset import preprocess_input
-from u_resnet_segesferoides.utils import colorize_mask, pad_image, postprocess_mask, tta_inference
+from u_resnet_segesferoides.utils import (
+    colorize_mask,
+    find_latest_run_dir,
+    pad_image,
+    postprocess_mask,
+    tta_inference,
+)
 
 
 def run_inference_cli(config_path):
@@ -23,15 +29,7 @@ def run_inference_cli(config_path):
 
     output_base_dir = os.path.join(config["paths"]["output_dir"], "models")
 
-    # Encontrar la carpeta de run más reciente para ESTE modelo
-    runs = sorted(glob.glob(os.path.join(output_base_dir, f"{model_name}_*")))
-    if not runs:
-        # Fallback a la carpeta run_* si se usó el formato viejo
-        runs = sorted(glob.glob(os.path.join(output_base_dir, "run_*")))
-        if not runs:
-            raise FileNotFoundError(f"No se encontró ningún entrenamiento previo para el modelo '{model_name}'")
-
-    run_dir = runs[-1]
+    run_dir = find_latest_run_dir(output_base_dir, model_name)
 
     # Recargar la configuración desde el DNI del modelo para obtener los umbrales empíricos
     run_config_path = os.path.join(run_dir, "config.yaml")
