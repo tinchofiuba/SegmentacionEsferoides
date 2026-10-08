@@ -12,7 +12,7 @@ lógica de modelo/entrenamiento).
 
 | Módulo | Estado | Notas |
 |---|---|---|
-| Pipeline de datos | OK | `SpheroidDataset` con crops de 512px centrados en objetos (80% sobre objeto / 20% random); normalización ImageNet; split train/val/test materializado en `splits/insitu_3t3/*.txt` (antes: recalculado con seed+shuffle en cada corrida) |
+| Pipeline de datos | OK | `SpheroidDataset` con crops de 512px centrados en objetos (80% sobre objeto / 20% random); normalización ImageNet; split train/val/test materializado en `splits/insitu_3t3/*.txt`, idéntico al de `spheroid-seg` (68/15/13; el split previo seed=42 58/28/10 está en `splits/insitu_3t3_seed42/` y las métricas anteriores a 2026-10-06 no son comparables) |
 | Modelo | OK | U-Net (segmentation-models-pytorch) con backbone ResNet34 (baseline); experimento con EfficientNet-B0 iniciado en rama `eff_backbone` (ver abajo) |
 | Loss | OK | Focal (γ=2.0) + Dice, combinadas 50/50 |
 | Entrenamiento | OK | AdamW + ReduceLROnPlateau (monitorea val_iou), checkpoint por mejor val_loss |
@@ -23,7 +23,7 @@ lógica de modelo/entrenamiento).
 | Scripts | Podados | Se borraron 19 scripts de debug/diagnóstico que apuntaban a datasets/runs ya inexistentes (ver "Limpieza de scripts" abajo); quedan solo `data_prep/prepare_insitu_dataset.py` y `viz/{generate_comparison_images,regenerate_comparisons}.py` |
 | CI | Pendiente | `.github/workflows/ci.yml` con lint + pytest |
 | Empaquetado | OK | `src/u_resnet_segesferoides/` instalable vía uv, entry points `u-resnet-train` / `u-resnet-infer` |
-| App de escritorio | OK (v1) | `app/` (PyQt5, extra opcional `uv sync --extra app`): predicción sobre toda la imagen o sobre una zona recortada a resolución nativa. Separación Model (`app/model.py`, sin Qt)/View. Ver "App de escritorio" en `CLAUDE.md` |
+| GUI de predicción/tagging | OK (v1), en repo aparte | Migrada a `/home/martin/repos/GUI_SegmentacionEsferoides` (independiente de este repo). Este repo expone `u_resnet_segesferoides.serve` (protocolo stdin/stdout). Ver "Backend para GUIs externas" en `CLAUDE.md` |
 
 ## Baseline conocido
 

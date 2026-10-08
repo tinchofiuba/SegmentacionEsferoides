@@ -59,6 +59,13 @@ histórica, no como algo a correr.
   `splits/insitu_3t3/` para el ejemplo vigente. `train_split`/`val_split`/
   `test_split`/`seed` quedan como fallback para configs que no usan
   `splits_dir` (p. ej. `configs/default.yaml`, legacy).
+  **El split vigente es idéntico al de `spheroid-seg`** (68/15/13, mismas
+  imágenes en cada conjunto, para poder comparar modelos entre repos). Se
+  importó con `scripts/data_prep/import_splits.py` (quita el sufijo
+  `_4x`/`_10x` y chequea leaks); no editar a mano. El split anterior
+  (seed=42, 58/28/10) quedó en `splits/insitu_3t3_seed42/` — los reportes y
+  métricas previos a esta fecha (2026-10-06) se midieron con ese, no son
+  comparables con corridas nuevas.
 - Mapeo de color de máscaras (fijo, no cambiar sin actualizar todo el
   pipeline): verde=1 (células sueltas), amarillo=2 (esferoides), cyan=3
   (atípicos) — ver `MASK_COLOR_TO_CLASS` en `dataset.py`.
@@ -79,45 +86,37 @@ disco, o duplicaban lo que ya hace `u-resnet-train`/`u-resnet-infer` — ver
 `docs/status.md`):
 - `data_prep/prepare_insitu_dataset.py`: convierte `ImgCrudas`/`ImgTaggeadas`
   al formato que espera `SpheroidDataset`.
+- `data_prep/import_splits.py`: importa un split de otro repo (spheroid-seg).
 - `viz/generate_comparison_images.py`, `viz/regenerate_comparisons.py`:
   collages de comparación sobre un modelo ya entrenado, sin reentrenar.
 
-## App de escritorio (predicción por zona)
+## Backend para GUIs externas (`serve`)
 
-`app/` (fuera de `src/`, no se empaqueta — es una app consumidora del
-paquete, no parte del "cerebro") expone una ventana PyQt5 para importar una
-imagen, verla achicada en pantalla, y predecir sobre toda la imagen o sobre
-una zona marcada con un recuadro arrastrable. Separación Model/View:
+La GUI de predicción/tagging **no vive en este repo**: está en
+`/home/martin/repos/GUI_SegmentacionEsferoides` y no importa nada de este
+paquete. Este repo tampoco sabe nada de la GUI: solo expone
+`src/u_resnet_segesferoides/serve.py`, un servidor genérico por stdin/stdout
+(una petición JSON por línea → una respuesta) que cualquier cliente puede
+usar. Comandos: `info`, `list_models`, `load`, `predict`, `shutdown`; la
+imagen y la máscara se pasan por ruta de archivo. El protocolo (v1) está
+especificado en `docs/protocol.md` del repo de la GUI.
 
-- `app/model.py`: `SegmentationModel` — sin ningún import de PyQt5, envuelve
-  un run entrenado (`config.yaml` + `best_model.pth`) y expone
-  `predict(image_rgb, magnification, bbox=None)`. Reusa `pad_image`,
-  `preprocess_input`, `tta_inference`, `postprocess_mask`, `colorize_mask`
-  del paquete — cero lógica de modelo duplicada. **Si hay `bbox`, recorta
-  ANTES de inferir** (preserva la escala en píxeles; nunca se reescala la
-  imagen antes de pasarla al modelo).
-- `app/editing.py`: edición de máscaras pura (pincel/borrador en trazos
-  continuos, borrar/reasignar objeto por flood fill, rellenar huecos, undo,
-  guardado en los colores de `ImgTaggeadas`). Tests en `tests/test_app_editing.py`.
-- `app/viewport.py`: matemática y render de zoom/pan (recorta solo la región
-  visible a resolución nativa; pirámide para zooms bajos). Tests en
-  `tests/test_app_viewport.py`.
-- `app/geometry.py`: mapeo preview↔nativa de la primera versión; ya no lo usa
-  la ventana (todo se edita en coordenadas nativas), se conserva con su test.
-- `app/image_canvas.py`, `app/main_window.py`, `app/main.py`: la View.
-  Controles: rueda = zoom, botón derecho/central = mover, `[` `]` = tamaño de
-  la herramienta, F = ajustar. "Aceptar" (Ctrl+S) guarda `<img>_Taggeada.png` +
-  `.origin.json` (manual / modelo / modelo_corregido).
-
-Instalar y correr (como módulo, con `-m` — correrlo como script suelto,
-`python app/main.py`, falla con `ModuleNotFoundError: No module named 'app'`
-porque Python agrega `app/` a `sys.path` en vez de la raíz del repo):
 ```bash
-uv sync --extra app
-uv run python -m app.main --output-dir outputs --model-name insitu_3t3
+uv run python -m u_resnet_segesferoides.serve --models-dir outputs/models \
+    [--model-name insitu_3t3 | --run-dir outputs/models/<run>]
 ```
-Carga el run más reciente que matchee `<model-name>_<fecha>` (vía
-`find_latest_run_dir` en `utils.py`, reusada también por `u-resnet-infer`).
+
+- Reusa `pad_image`, `preprocess_input`, `tta_inference`, `postprocess_mask`:
+  cero lógica de modelo duplicada. **Si hay `bbox`, recorta ANTES de inferir**
+  (preserva la escala en píxeles; nunca se reescala la imagen).
+- Lee `training.encoder_name` del `config.yaml` de cada run (default
+  resnet34), así sirve también runs EfficientNet.
+- stdout es solo protocolo (se redirige el resto a stderr): no hacer `print`
+  a stdout en el camino de `serve`. Tests en `tests/test_serve.py`.
+- Para usarlo desde la GUI: `config/backends.yaml` del repo de la GUI apunta a
+  `.venv/bin/python -m u_resnet_segesferoides.serve ...` de este repo.
+- `list_models` marca con una nota los runs sin `metrics.txt` (probablemente
+  entrenándose: su `best_model.pth` se sobrescribe).
 
 ## Reportes de experimentos
 
