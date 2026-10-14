@@ -40,6 +40,20 @@ def test_load_mask_labels_unknown_color_is_background(make_mask_png):
     assert (labels == 0).all()
 
 
+def test_load_mask_labels_reads_class_ids_from_single_channel_png(tmp_path):
+    ids = np.zeros((6, 6), dtype=np.uint8)
+    ids[0:2, 0:2], ids[2:4, 0:2], ids[4:6, 0:2], ids[0:2, 4:6] = 1, 2, 3, 7  # 7: id desconocido
+    path = str(tmp_path / "ids.png")
+    cv2.imwrite(path, ids)
+
+    labels = load_mask_labels(path)
+
+    assert labels.shape == (6, 6) and labels.dtype == np.uint8
+    assert (labels[0:2, 0:2] == 1).all() and (labels[2:4, 0:2] == 2).all()
+    assert (labels[4:6, 0:2] == 3).all()
+    assert (labels[0:2, 4:6] == 0).all() and (labels[:, 2:4] == 0).all()
+
+
 def test_load_mask_labels_missing_file_returns_none(tmp_path):
     missing_path = str(tmp_path / "no_existe.png")
 

@@ -21,6 +21,7 @@ dependencies = [
 [project.scripts]
 u-resnet-train = "u_resnet_segesferoides.train:main"
 u-resnet-infer = "u_resnet_segesferoides.inference:main"
+u-resnet-serve = "u_resnet_segesferoides.serve:main"
 
 [dependency-groups]
 dev = [

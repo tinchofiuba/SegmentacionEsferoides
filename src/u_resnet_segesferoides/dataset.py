@@ -20,11 +20,22 @@ MASK_COLOR_TO_CLASS = {
 
 
 def load_mask_labels(mask_path):
-    """Lee una máscara taggeada a color y la decodifica a clases 0-3 (1 canal)."""
-    img = cv2.imread(mask_path)
+    """Lee una máscara y la devuelve como clases 0-3 (1 canal, uint8).
+
+    Formato principal: PNG de 1 canal con el id de clase en cada píxel
+    (0 = fondo, 1 = células sueltas, 2 = esferoides, 3 = atípicos); es lo que
+    guarda la GUI. Un valor que no sea una clase conocida cuenta como fondo.
+    Por compatibilidad también se acepta el formato viejo, a color
+    (`MASK_COLOR_TO_CLASS`)."""
+    img = cv2.imread(mask_path, cv2.IMREAD_UNCHANGED)
     if img is None:
         return None
     labels = np.zeros(img.shape[:2], dtype=np.uint8)
+    if img.ndim == 2:
+        for class_id in MASK_COLOR_TO_CLASS.values():
+            labels[img == class_id] = class_id
+        return labels
+    img = img[..., :3]  # descarta alfa si lo hubiera
     for bgr, class_id in MASK_COLOR_TO_CLASS.items():
         match = np.all(img == bgr, axis=-1)
         labels[match] = class_id
