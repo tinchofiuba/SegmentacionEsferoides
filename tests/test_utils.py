@@ -1,10 +1,12 @@
 import os
 
+import cv2
 import numpy as np
 import pytest
 
 from u_resnet_segesferoides.utils import (
     colorize_mask,
+    component_shape_metrics,
     find_latest_run_dir,
     pad_image,
     postprocess_mask,
@@ -88,32 +90,67 @@ def test_postprocess_mask_without_thresholds_is_noop():
     assert (result == mask).all()
 
 
-def test_postprocess_mask_discards_blob_below_min_diameter():
+def _thresholds(min_diam=0.0, max_diam=999.0, min_circ=0.0):
+    cls = {"n": 1, "area": {"mean": 0.0, "p5": 0.0, "p95": 0.0},
+           "diameter": {"mean": 0.0, "p5": min_diam, "p95": max_diam},
+           "circularity": {"mean": 0.0, "p5": min_circ, "p95": 1.0}}
+    return {"10x": {"c1": cls, "c2": cls, "c3": cls}}
+
+
+def test_postprocess_mask_old_format_thresholds_is_noop():
+    mask = np.zeros((10, 10), dtype=np.uint8)
+    mask[2:8, 2:8] = 1
+    old = {"10x": {"c1_min": 99.0, "c1_max": 100.0}}
+
+    assert (postprocess_mask(mask, "image_10x.png", old) == mask).all()
+
+
+def test_postprocess_mask_discards_blob_below_class1_p5_whatever_the_class():
     mask = np.zeros((30, 30), dtype=np.uint8)
-    mask[0:3, 0:3] = 1  # blob chico, diametro ~3.4px
+    mask[0:3, 0:3] = 1  # diametro ~3.4px
+    mask[10:13, 10:13] = 2
+    mask[20:23, 20:23] = 3
 
-    thresholds = {"10x": {
-        "c1_min": 5.0, "c1_max": 100.0,
-        "c2_min": 0.0, "c2_max": 999.0,
-        "c3_min": 0.0, "c3_max": 999.0,
-    }}
-
-    result = postprocess_mask(mask, "image_10x.png", thresholds)
+    result = postprocess_mask(mask, "image_10x.png", _thresholds(min_diam=5.0))
 
     assert (result == 0).all()
 
 
-def test_postprocess_mask_mutates_oversized_class1_to_class2():
-    mask = np.zeros((30, 30), dtype=np.uint8)
-    mask[5:25, 5:25] = 1  # blob grande 20x20, diametro ~22.6px
+def test_postprocess_mask_large_circular_class1_is_kept():
+    mask = np.zeros((40, 40), dtype=np.uint8)
+    cv2.circle(mask, (20, 20), 12, 1, -1)
 
-    thresholds = {"10x": {
-        "c1_min": 0.0, "c1_max": 15.0,
-        "c2_min": 0.0, "c2_max": 999.0,
-        "c3_min": 0.0, "c3_max": 999.0,
-    }}
+    result = postprocess_mask(mask, "image_10x.png", _thresholds(max_diam=15.0, min_circ=0.6))
 
-    result = postprocess_mask(mask, "image_10x.png", thresholds)
+    assert (result == mask).all()
 
-    assert (result[5:25, 5:25] == 2).all()
+
+def test_postprocess_mask_large_noncircular_class1_becomes_class2():
+    mask = np.zeros((60, 60), dtype=np.uint8)
+    mask[25:30, 5:55] = 1  # barra 5x50: diametro ~17.8px, circularidad ~0.3
+
+    result = postprocess_mask(mask, "image_10x.png", _thresholds(max_diam=10.0, min_circ=0.6))
+
+    assert (result[25:30, 5:55] == 2).all()
     assert (result[result != 2] == 0).all()
+
+
+def test_postprocess_mask_small_noncircular_class1_stays_class1():
+    mask = np.zeros((60, 60), dtype=np.uint8)
+    mask[25:28, 5:30] = 1  # barra 3x25: poco circular pero diametro < p95
+
+    result = postprocess_mask(mask, "image_10x.png", _thresholds(max_diam=50.0, min_circ=0.6))
+
+    assert (result == mask).all()
+
+
+def test_component_shape_metrics_circle_vs_bar():
+    img = np.zeros((60, 60), dtype=np.uint8)
+    cv2.circle(img, (15, 15), 10, 1, -1)
+    img[40:43, 5:55] = 1
+    _, labels, stats, _ = cv2.connectedComponentsWithStats(img, connectivity=8)
+    metrics = sorted((component_shape_metrics(labels, stats, i) for i in (1, 2)), key=lambda m: m[2])
+
+    bar, circle = metrics
+    assert circle[2] > 0.8
+    assert bar[2] < 0.3

@@ -228,3 +228,15 @@ Resultados_3T3/
 Resultados_Test_Final/
 *.tiff
 *.tif
+
+# PDFs (papers de terceros)
+*.pdf
+
+# Pesos de modelos entrenados
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.onnx
+*.h5
+*.msgpack

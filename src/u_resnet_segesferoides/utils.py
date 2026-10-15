@@ -1,6 +1,7 @@
 import glob
 import os
 import re
+import sys
 
 import cv2
 import numpy as np
@@ -115,10 +116,62 @@ def tta_inference(model, tensor_img):
 
     return (out1 + out2 + out3 + out4) / 4.0
 
+# Factores de escala 4x -> 10x (relación lineal 10/4). Solo se usan como fallback
+# cuando una clase no tiene ejemplos en una de las dos magnificaciones.
+MAG_LINEAR_SCALE = 2.5
+_NO_FILTER_STATS = {
+    "n": 0,
+    "area": {"mean": 0.0, "p5": 0.0, "p95": 999999.0},
+    "diameter": {"mean": 0.0, "p5": 0.0, "p95": 999999.0},
+    "circularity": {"mean": 0.0, "p5": 0.0, "p95": 1.0},
+}
+
+
+def component_shape_metrics(labels, stats, i):
+    """Área, diámetro equivalente y circularidad (4π·A/P²) del componente `i`
+    de `cv2.connectedComponentsWithStats`. El perímetro se mide sobre el contorno
+    externo, recortando al bbox del componente para no tocar la imagen entera."""
+    x, y, w, h, area = (int(v) for v in stats[i])
+    diam = 2 * np.sqrt(area / np.pi)
+    crop = (labels[max(y - 1, 0): y + h + 1, max(x - 1, 0): x + w + 1] == i).astype(np.uint8)
+    contours, _ = cv2.findContours(crop, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    perimeter = max((cv2.arcLength(c, True) for c in contours), default=0.0)
+    circularity = 4 * np.pi * area / perimeter**2 if perimeter > 0 else 0.0
+    return float(area), float(diam), float(circularity)
+
+
+def _summarize(values):
+    return {"mean": float(np.mean(values)), "p5": float(np.percentile(values, 5)),
+            "p95": float(np.percentile(values, 95))}
+
+
+def _class_stats(samples):
+    """samples: lista de (area, diametro, circularidad). None si está vacía."""
+    if not samples:
+        return None
+    arr = np.asarray(samples, dtype=np.float64)
+    return {"n": len(samples), "area": _summarize(arr[:, 0]),
+            "diameter": _summarize(arr[:, 1]), "circularity": _summarize(arr[:, 2])}
+
+
+def _rescale_stats(stats, linear):
+    """Pasa estadísticas de una magnificación a otra: diámetro x linear, área x linear²,
+    circularidad sin cambios (adimensional)."""
+    out = {"n": 0, "circularity": dict(stats["circularity"])}
+    out["area"] = {k: v * linear**2 for k, v in stats["area"].items()}
+    out["diameter"] = {k: v * linear for k, v in stats["diameter"].items()}
+    return out
+
+
 def calculate_empirical_thresholds(config):
     """
-    Escanea las máscaras y obtiene min/max reales (p5 y p95 del diámetro equivalente)
-    para 4x y 10x independientemente. Extrapola (x2.5) si faltan datos en alguna clase.
+    Escanea las máscaras y obtiene, por magnificación (4x/10x) y por clase (1, 2, 3),
+    el promedio, p5 y p95 de área, diámetro equivalente y circularidad.
+    Si una clase no tiene ejemplos en una magnificación, se extrapola desde la otra
+    (x2.5 en diámetro, x6.25 en área, circularidad igual).
+
+    Devuelve {"4x": {"c1": {"n", "area", "diameter", "circularity"}, "c2": ..., "c3": ...}, "10x": ...}
+    con cada métrica = {"mean", "p5", "p95"}.
     """
     import glob
     import os
@@ -129,14 +182,12 @@ def calculate_empirical_thresholds(config):
     masks_dir = config["paths"]["masks_dir"]
     all_imgs = sorted(glob.glob(os.path.join(images_dir, "*.png")))
 
-    diams_4x = {1: [], 2: [], 3: []}
-    diams_10x = {1: [], 2: [], 3: []}
+    samples = {"4x": {1: [], 2: [], 3: []}, "10x": {1: [], 2: [], 3: []}}
 
     for img_path in all_imgs:
         basename = os.path.basename(img_path).replace(".png", "")
         mask_base = basename.replace("_4x", "").replace("_10x", "")
-        mask_name = mask_base + "-Mask.png"
-        mask_path = os.path.join(masks_dir, mask_name)
+        mask_path = os.path.join(masks_dir, mask_base + "-Mask.png")
 
         if not os.path.exists(mask_path):
             continue
@@ -145,103 +196,87 @@ def calculate_empirical_thresholds(config):
         if mask is None:
             continue
 
-        is_4x = "_4x" in basename
-        target_dict = diams_4x if is_4x else diams_10x
+        target = samples["4x" if "_4x" in basename else "10x"]
 
         for c in [1, 2, 3]:
             class_mask = (mask == c).astype(np.uint8)
-            num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(class_mask, connectivity=8)
+            num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(class_mask, connectivity=8)
             for i in range(1, num_labels):
-                area = stats[i, cv2.CC_STAT_AREA]
-                diam = 2 * np.sqrt(area / np.pi)
-                target_dict[c].append(diam)
+                target[c].append(component_shape_metrics(labels, stats, i))
 
-    def get_stats(diam_list):
-        if len(diam_list) == 0:
-            return None, None
-        return float(np.percentile(diam_list, 5)), float(np.percentile(diam_list, 95))
-
-    stats_4x = {c: get_stats(diams_4x[c]) for c in [1, 2, 3]}
-    stats_10x = {c: get_stats(diams_10x[c]) for c in [1, 2, 3]}
-
-    # Fallback extrapolation
+    thresholds = {"4x": {}, "10x": {}}
     for c in [1, 2, 3]:
-        min4, max4 = stats_4x[c]
-        min10, max10 = stats_10x[c]
+        s4, s10 = _class_stats(samples["4x"][c]), _class_stats(samples["10x"][c])
+        if s4 is None and s10 is not None:
+            s4 = _rescale_stats(s10, 1 / MAG_LINEAR_SCALE)
+        elif s10 is None and s4 is not None:
+            s10 = _rescale_stats(s4, MAG_LINEAR_SCALE)
+        elif s4 is None and s10 is None:
+            s4 = s10 = _NO_FILTER_STATS
+        thresholds["4x"][f"c{c}"] = s4
+        thresholds["10x"][f"c{c}"] = s10
 
-        if min4 is None and min10 is not None:
-            stats_4x[c] = (min10 / 2.5, max10 / 2.5)
-        elif min10 is None and min4 is not None:
-            stats_10x[c] = (min4 * 2.5, max4 * 2.5)
-        elif min4 is None and min10 is None:
-            # Absolute fallback if class doesn't exist at all
-            stats_4x[c] = (0.0, 999999.0)
-            stats_10x[c] = (0.0, 999999.0)
+    for mag in ["4x", "10x"]:
+        print(f"\n[Estadísticas Empíricas Extraídas - {mag}]  (n, diámetro p5-p95, circularidad p5-p95)")
+        for c in [1, 2, 3]:
+            t = thresholds[mag][f"c{c}"]
+            print(f"  C{c}: n={t['n']}  diam {t['diameter']['p5']:.1f}-{t['diameter']['p95']:.1f}"
+                  f"  circ {t['circularity']['p5']:.3f}-{t['circularity']['p95']:.3f}")
+    print()
 
-    # Format into config dictionary
-    thresholds_4x = {
-        "c1_min": stats_4x[1][0], "c1_max": stats_4x[1][1],
-        "c2_min": stats_4x[2][0], "c2_max": stats_4x[2][1],
-        "c3_min": stats_4x[3][0], "c3_max": stats_4x[3][1]
-    }
-
-    thresholds_10x = {
-        "c1_min": stats_10x[1][0], "c1_max": stats_10x[1][1],
-        "c2_min": stats_10x[2][0], "c2_max": stats_10x[2][1],
-        "c3_min": stats_10x[3][0], "c3_max": stats_10x[3][1]
-    }
-
-    # Imprimir para visualización del usuario (temporal)
-    print("\n[Estadísticas Empíricas Extraídas - 4x]")
-    print(f"  C1: {thresholds_4x['c1_min']:.1f} a {thresholds_4x['c1_max']:.1f}")
-    print(f"  C2: {thresholds_4x['c2_min']:.1f} a {thresholds_4x['c2_max']:.1f}")
-    print(f"  C3: {thresholds_4x['c3_min']:.1f} a {thresholds_4x['c3_max']:.1f}")
-
-    print("\n[Estadísticas Empíricas Extraídas - 10x]")
-    print(f"  C1: {thresholds_10x['c1_min']:.1f} a {thresholds_10x['c1_max']:.1f}")
-    print(f"  C2: {thresholds_10x['c2_min']:.1f} a {thresholds_10x['c2_max']:.1f}")
-    print(f"  C3: {thresholds_10x['c3_min']:.1f} a {thresholds_10x['c3_max']:.1f}\n")
-
-    return {"4x": thresholds_4x, "10x": thresholds_10x}
+    return thresholds
 
 
 def postprocess_mask(mask, filename, empirical_thresholds):
-    """Limpia y corrige la máscara usando los umbrales empíricos de diámetro de su DNI."""
+    """Limpia la máscara con los umbrales empíricos de la clase 1 (solo 2 reglas):
+
+    1. Descarta todo componente (de cualquier clase) con diámetro equivalente menor
+       al p5 de la clase 1.
+    2. Un componente de clase 1 con diámetro mayor al p95 de la clase 1 Y circularidad
+       menor al p5 de la clase 1 pasa a clase 2.
+
+    Después rellena los huecos de las clases 2 y 3.
+    """
     if not empirical_thresholds:
         return mask # Fallback si el yaml no tiene thresholds guardados
 
     is_4x = "_4x" in filename
     th = empirical_thresholds["4x"] if is_4x else empirical_thresholds["10x"]
+    if "c1" not in th:
+        # Umbrales en formato viejo (c1_min/c1_max...): hay que recalcularlos con
+        # scripts/postprocess/recompute_thresholds.py
+        print("AVISO: umbrales empíricos en formato viejo; se omite el post-procesado.",
+              file=sys.stderr)
+        return mask
+    min_diam = th["c1"]["diameter"]["p5"]
+    max_diam = th["c1"]["diameter"]["p95"]
+    min_circ = th["c1"]["circularity"]["p5"]
 
     cleaned_mask = np.zeros(mask.shape, dtype=np.uint8)
 
     for c in [1, 2, 3]:
         class_mask = (mask == c).astype(np.uint8)
-        num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(class_mask, connectivity=8)
+        num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(class_mask, connectivity=8)
 
         for i in range(1, num_labels):
             area = stats[i, cv2.CC_STAT_AREA]
             diam = 2 * np.sqrt(area / np.pi)
 
-            # Filtro estricto: Descartar (dejar en 0) si es menor a su propio mínimo empírico
-            if c == 1 and diam < th["c1_min"]:
-                continue
-            if c == 2 and diam < th["c2_min"]:
-                continue
-            if c == 3 and diam < th["c3_min"]:
+            # Regla 1: absurdo por tamaño, sin importar la clase predicha
+            if diam < min_diam:
                 continue
 
             final_class = c
 
-            # Regla de mutación: C1 es imposiblemente grande -> Muta a C2
-            if c == 1 and diam > th["c1_max"]:
-                final_class = 2
+            # Regla 2: C1 grande Y poco circular -> es C2
+            if c == 1 and diam > max_diam:
+                _, _, circ = component_shape_metrics(labels, stats, i)
+                if circ < min_circ:
+                    final_class = 2
 
-            # Asignar la clase final a todos los píxeles de esta mancha
             cleaned_mask[labels == i] = final_class
 
-    # Rule 4: Consolidación Física (Rellenar Agujeros)
-    # Rellenamos cualquier "agujero" (sea fondo o C1 atrapado) dentro de las masas mayores
+    # Consolidación física: rellenar agujeros dentro de las masas de clase 2 y 3
     for c in [2, 3]:
         class_mask = (cleaned_mask == c).astype(np.uint8)
         if np.sum(class_mask) == 0:

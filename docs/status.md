@@ -16,7 +16,7 @@ lógica de modelo/entrenamiento).
 | Modelo | OK | U-Net (segmentation-models-pytorch) con backbone ResNet34 (baseline); experimento con EfficientNet-B0 iniciado en rama `eff_backbone` (ver abajo) |
 | Loss | OK | Focal (γ=2.0) + Dice, combinadas 50/50 |
 | Entrenamiento | OK | AdamW + ReduceLROnPlateau (monitorea val_iou), checkpoint por mejor val_loss |
-| Post-procesado empírico | OK, bajo revisión | Filtra blobs por percentil 5/95 de diámetro (por clase, por aumento 4x/10x) y muta C1→C2 si es demasiado grande; ver pendiente #4 abajo |
+| Post-procesado empírico | OK, bajo revisión | Descarta todo blob con diámetro < p5 de la clase 1 y pasa C1→C2 si diámetro > p95 de C1 Y circularidad < p5 de C1 (estadísticas de área/diámetro/circularidad por clase y aumento); ver pendiente #4 abajo |
 | Inferencia | OK | TTA opcional (4 vistas, flips), stitching NO implementado (una sola pasada sobre la imagen completa, con padding a múltiplo de 32) |
 | Collages de comparación | OK | Original / Ground Truth / Predicción, 3 paneles |
 | Tests | Reescritos | `tests/` ahora tiene tests reales con fixtures sintéticas (antes: 0 asserts reales) |

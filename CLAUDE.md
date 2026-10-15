@@ -87,6 +87,10 @@ disco, o duplicaban lo que ya hace `u-resnet-train`/`u-resnet-infer` — ver
 - `data_prep/prepare_insitu_dataset.py`: convierte `ImgCrudas`/`ImgTaggeadas`
   al formato que espera `SpheroidDataset`.
 - `data_prep/import_splits.py`: importa un split de otro repo (spheroid-seg).
+- `postprocess/recompute_thresholds.py`: recalcula `inference.empirical_thresholds`
+  en el `config.yaml` de runs ya entrenados (el post-proceso no depende de los
+  pesos, no hace falta reentrenar). Resguarda el original como
+  `config.pre_thresholds.yaml`.
 - `viz/generate_comparison_images.py`, `viz/regenerate_comparisons.py`:
   collages de comparación sobre un modelo ya entrenado, sin reentrenar.
 

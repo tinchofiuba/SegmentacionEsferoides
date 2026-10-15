@@ -144,19 +144,24 @@ def prepare_data(config):
         def basename_of(pair):
             return os.path.basename(pair[0]).replace(".png", "")
 
-        pairs_by_basename = {basename_of(p): p for p in pairs}
+        # Los splits listan basenames sin el sufijo de aumento (_4x/_10x), igual que
+        # las máscaras; se indexa por el nombre sin sufijo.
+        def strip_mag(name):
+            return name.replace("_4x", "").replace("_10x", "")
+
+        pairs_by_basename = {strip_mag(basename_of(p)): p for p in pairs}
 
         def load_split_file(split_name):
             split_path = os.path.join(splits_dir, f"{split_name}.txt")
             with open(split_path) as f:
                 names = [line.strip() for line in f if line.strip()]
-            missing = [n for n in names if n not in pairs_by_basename]
+            missing = [n for n in names if strip_mag(n) not in pairs_by_basename]
             if missing:
                 raise ValueError(
                     f"No se encontraron estas imágenes del split '{split_name}' "
                     f"({split_path}): {missing}"
                 )
-            return [pairs_by_basename[n] for n in names]
+            return [pairs_by_basename[strip_mag(n)] for n in names]
 
         train_pairs = load_split_file("train")
         val_pairs = load_split_file("val")
