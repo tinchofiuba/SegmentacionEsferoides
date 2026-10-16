@@ -9,7 +9,7 @@ validado del paquete.
     uv run python -m u_resnet_segesferoides.serve --models-dir outputs/models \\
         [--model-name insitu_3t3 | --run-dir outputs/models/<run>]
 
-Peticiones: info, list_models, load {model}, predict {image, magnification,
+Peticiones: info, list_models, load {model}, reference_stats, predict {image, magnification,
 bbox, out}, shutdown. Todo lo que no sea protocolo va a stderr.
 """
 
@@ -90,6 +90,7 @@ class UResnetBackend:
             "magnifications": MAGNIFICATIONS,
             "supports_bbox": True,
             "accepts_model_path": True,
+            "supports_reference_stats": True,
         }
 
     def list_models(self):
@@ -127,6 +128,18 @@ class UResnetBackend:
         self.use_tta = inference.get("use_tta", False)
         self.empirical_thresholds = inference.get("empirical_thresholds")
         return {"description": os.path.basename(run_dir)}
+
+    def reference_stats(self):
+        """Estadística de entrenamiento (inference.empirical_thresholds del
+        config.yaml del run) como {magnificación: {id de clase: {...}}}; las
+        claves "c1", "c2"... pasan a ids. None si no hay modelo o el run no la trae."""
+        if self.model is None or not self.empirical_thresholds:
+            return None
+        return {
+            magnification: {key[1:]: stats for key, stats in per_class.items()
+                            if key.startswith("c") and key[1:].isdigit()}
+            for magnification, per_class in self.empirical_thresholds.items()
+        }
 
     def predict(self, image, magnification, bbox, out):
         if self.model is None:
@@ -168,6 +181,8 @@ def dispatch(backend, req):
         return backend.list_models()
     if cmd == "load":
         return backend.load(req["model"])
+    if cmd == "reference_stats":
+        return backend.reference_stats()
     if cmd == "predict":
         return backend.predict(req["image"], req["magnification"], req.get("bbox"), req["out"])
     raise ValueError(f"comando desconocido: {cmd!r}")

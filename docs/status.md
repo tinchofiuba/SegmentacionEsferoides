@@ -23,7 +23,7 @@ lógica de modelo/entrenamiento).
 | Scripts | Podados | Se borraron 19 scripts de debug/diagnóstico que apuntaban a datasets/runs ya inexistentes (ver "Limpieza de scripts" abajo); quedan solo `data_prep/prepare_insitu_dataset.py` y `viz/{generate_comparison_images,regenerate_comparisons}.py` |
 | CI | Pendiente | `.github/workflows/ci.yml` con lint + pytest |
 | Empaquetado | OK | `src/u_resnet_segesferoides/` instalable vía uv, entry points `u-resnet-train` / `u-resnet-infer` |
-| GUI de predicción/tagging | OK (v1), en repo aparte | Migrada a `/home/martin/repos/GUI_SegmentacionEsferoides` (independiente de este repo). Este repo expone `u_resnet_segesferoides.serve` (protocolo stdin/stdout). Ver "Backend para GUIs externas" en `CLAUDE.md` |
+| GUI de predicción/tagging | OK (v1), en repo aparte | Migrada a `GUI_SegmentacionEsferoides` (independiente de este repo). Este repo expone `u_resnet_segesferoides.serve` (protocolo stdin/stdout). Ver "Backend para GUIs externas" en `CLAUDE.md` |
 
 ## Baseline conocido
 
@@ -116,7 +116,7 @@ confirmadamente muertos — ninguno quedó con lógica rescatable que no esté y
 en el paquete:
 
 - Apuntaban a `inputsConvertidas/0_1_2_3`/`ConColores` o a
-  `/home/martin/Descargas/drive-download-*`, directorios que ya no existen
+  `drive-download-*`, directorios que ya no existen
   en disco (`analyze_areas.py`, `check_ground_truth.py`, `find_3_classes.py`,
   `convert_masks.py`, `visualize_mask.py`, `convert_jpg_to_tiff.py`,
   `extract_3t3_masks.py`, `diagnose.py`).

@@ -97,7 +97,7 @@ disco, o duplicaban lo que ya hace `u-resnet-train`/`u-resnet-infer` — ver
 ## Backend para GUIs externas (`serve`)
 
 La GUI de predicción/tagging **no vive en este repo**: está en
-`/home/martin/repos/GUI_SegmentacionEsferoides` y no importa nada de este
+`GUI_SegmentacionEsferoides` (`tinchofiuba/GUI_SegmentacionEsferoides`) y no importa nada de este
 paquete. Este repo tampoco sabe nada de la GUI: solo expone
 `src/u_resnet_segesferoides/serve.py`, un servidor genérico por stdin/stdout
 (una petición JSON por línea → una respuesta) que cualquier cliente puede
