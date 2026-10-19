@@ -154,3 +154,5 @@ def test_component_shape_metrics_circle_vs_bar():
     bar, circle = metrics
     assert circle[2] > 0.8
     assert bar[2] < 0.3
+    assert bar[3] > circle[3]                  # el perímetro es el 4º valor
+    assert abs(circle[3] - 2 * np.pi * 10) < 4

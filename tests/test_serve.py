@@ -18,7 +18,7 @@ class StubBackend:
             raise FileNotFoundError("no existe")
         return {"description": model}
 
-    def predict(self, image, magnification, bbox, out):
+    def predict(self, image, magnification, bbox, out, postprocess=None, discarded_out=None):
         return {"mask": out}
 
 

@@ -9,7 +9,7 @@ validado del paquete.
     uv run python -m u_resnet_segesferoides.serve --models-dir outputs/models \\
         [--model-name insitu_3t3 | --run-dir outputs/models/<run>]
 
-Peticiones: info, list_models, load {model}, reference_stats, predict {image, magnification,
+Peticiones: info, list_models, load {model}, reference_stats, get_postprocess, predict {image, magnification,
 bbox, out}, shutdown. Todo lo que no sea protocolo va a stderr.
 """
 
@@ -26,9 +26,11 @@ import torch
 from u_resnet_segesferoides.config import load_config
 from u_resnet_segesferoides.dataset import MASK_COLOR_TO_CLASS, preprocess_input
 from u_resnet_segesferoides.utils import (
+    DEFAULT_POSTPROCESS,
+    apply_postprocess,
     find_latest_run_dir,
     pad_image,
-    postprocess_mask,
+    validate_postprocess,
     tta_inference,
 )
 
@@ -75,6 +77,7 @@ class UResnetBackend:
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.run_dir = None
         self.model = None
+        self.postprocess = DEFAULT_POSTPROCESS
         if initial_run_dir:
             try:
                 self.load(initial_run_dir)
@@ -91,6 +94,7 @@ class UResnetBackend:
             "supports_bbox": True,
             "accepts_model_path": True,
             "supports_reference_stats": True,
+            "supports_postprocess": True,
         }
 
     def list_models(self):
@@ -127,6 +131,8 @@ class UResnetBackend:
         inference = config.get("inference", {})
         self.use_tta = inference.get("use_tta", False)
         self.empirical_thresholds = inference.get("empirical_thresholds")
+        self.postprocess = inference.get("postprocess") or DEFAULT_POSTPROCESS
+        validate_postprocess(self.postprocess)
         return {"description": os.path.basename(run_dir)}
 
     def reference_stats(self):
@@ -141,7 +147,18 @@ class UResnetBackend:
             for magnification, per_class in self.empirical_thresholds.items()
         }
 
-    def predict(self, image, magnification, bbox, out):
+    def get_postprocess(self):
+        """Reglas de post-procesado vigentes del modelo cargado y las de fábrica
+        (para que el cliente pueda restaurarlas)."""
+        return {**self.postprocess, "defaults": DEFAULT_POSTPROCESS}
+
+    def predict(self, image, magnification, bbox, out, postprocess=None, discarded_out=None):
+        """`postprocess` ({"rules", "fill_holes"}) reemplaza las reglas del modelo
+        solo en esta petición. Con `discarded_out` escribe además un PNG de 1 canal
+        con la clase original de lo que las reglas descartaron (0 = nada) y devuelve
+        además `discarded_reasons`: por cada objeto descartado, la regla y las medidas."""
+        if postprocess is not None:
+            validate_postprocess(postprocess)
         if self.model is None:
             raise RuntimeError("No hay ningún modelo cargado")
         if magnification not in MAGNIFICATIONS:
@@ -156,13 +173,20 @@ class UResnetBackend:
             x, y, w, h = (int(v) for v in bbox)
             image_rgb = image_rgb[y : y + h, x : x + w]
 
-        pred_mask = self._infer(image_rgb, magnification)
+        reasons = []
+        pred_mask, discarded = self._infer(image_rgb, magnification, postprocess or self.postprocess, reasons)
         if not cv2.imwrite(out, pred_mask.astype(np.uint8)):
             raise OSError(f"No se pudo escribir la máscara en {out}")
-        return {"mask": out}
+        result = {"mask": out}
+        if discarded_out:
+            if not cv2.imwrite(discarded_out, discarded):
+                raise OSError(f"No se pudo escribir los descartados en {discarded_out}")
+            result["discarded"] = discarded_out
+            result["discarded_reasons"] = reasons
+        return result
 
     # ---------- inferencia (misma lógica que u-resnet-infer) ----------
-    def _infer(self, image_rgb, magnification):
+    def _infer(self, image_rgb, magnification, postprocess, reasons=None):
         padded_img, orig_h, orig_w = pad_image(image_rgb)
         tensor_img = preprocess_input(padded_img).astype(np.float32)
         tensor_img = torch.from_numpy(tensor_img.transpose(2, 0, 1)).unsqueeze(0).to(self.device)
@@ -170,7 +194,8 @@ class UResnetBackend:
             outputs = tta_inference(self.model, tensor_img) if self.use_tta else self.model(tensor_img)
             pred_mask = torch.argmax(outputs, dim=1).squeeze(0).cpu().numpy()
         pred_mask = pred_mask[:orig_h, :orig_w]
-        return postprocess_mask(pred_mask, f"zona_{magnification}.png", self.empirical_thresholds)
+        thresholds = (self.empirical_thresholds or {}).get(magnification)
+        return apply_postprocess(pred_mask, postprocess, thresholds, reasons)
 
 
 def dispatch(backend, req):
@@ -183,8 +208,11 @@ def dispatch(backend, req):
         return backend.load(req["model"])
     if cmd == "reference_stats":
         return backend.reference_stats()
+    if cmd == "get_postprocess":
+        return backend.get_postprocess()
     if cmd == "predict":
-        return backend.predict(req["image"], req["magnification"], req.get("bbox"), req["out"])
+        return backend.predict(req["image"], req["magnification"], req.get("bbox"), req["out"],
+                               req.get("postprocess"), req.get("discarded_out"))
     raise ValueError(f"comando desconocido: {cmd!r}")
 
 

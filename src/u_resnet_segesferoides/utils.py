@@ -124,12 +124,13 @@ _NO_FILTER_STATS = {
     "area": {"mean": 0.0, "p5": 0.0, "p95": 999999.0},
     "diameter": {"mean": 0.0, "p5": 0.0, "p95": 999999.0},
     "circularity": {"mean": 0.0, "p5": 0.0, "p95": 1.0},
+    "perimeter": {"mean": 0.0, "p5": 0.0, "p95": 999999.0},
 }
 
 
 def component_shape_metrics(labels, stats, i):
-    """Área, diámetro equivalente y circularidad (4π·A/P²) del componente `i`
-    de `cv2.connectedComponentsWithStats`. El perímetro se mide sobre el contorno
+    """Área, diámetro equivalente, circularidad (4π·A/P²) y perímetro del componente
+    `i` de `cv2.connectedComponentsWithStats`. El perímetro se mide sobre el contorno
     externo, recortando al bbox del componente para no tocar la imagen entera."""
     x, y, w, h, area = (int(v) for v in stats[i])
     diam = 2 * np.sqrt(area / np.pi)
@@ -137,7 +138,7 @@ def component_shape_metrics(labels, stats, i):
     contours, _ = cv2.findContours(crop, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     perimeter = max((cv2.arcLength(c, True) for c in contours), default=0.0)
     circularity = 4 * np.pi * area / perimeter**2 if perimeter > 0 else 0.0
-    return float(area), float(diam), float(circularity)
+    return float(area), float(diam), float(circularity), float(perimeter)
 
 
 def _summarize(values):
@@ -146,18 +147,20 @@ def _summarize(values):
 
 
 def _class_stats(samples):
-    """samples: lista de (area, diametro, circularidad). None si está vacía."""
+    """samples: lista de (area, diametro, circularidad, perimetro). None si está vacía."""
     if not samples:
         return None
     arr = np.asarray(samples, dtype=np.float64)
     return {"n": len(samples), "area": _summarize(arr[:, 0]),
-            "diameter": _summarize(arr[:, 1]), "circularity": _summarize(arr[:, 2])}
+            "diameter": _summarize(arr[:, 1]), "circularity": _summarize(arr[:, 2]),
+            "perimeter": _summarize(arr[:, 3])}
 
 
 def _rescale_stats(stats, linear):
-    """Pasa estadísticas de una magnificación a otra: diámetro x linear, área x linear²,
-    circularidad sin cambios (adimensional)."""
+    """Pasa estadísticas de una magnificación a otra: diámetro y perímetro x linear,
+    área x linear², circularidad sin cambios (adimensional)."""
     out = {"n": 0, "circularity": dict(stats["circularity"])}
+    out["perimeter"] = {k: v * linear for k, v in stats["perimeter"].items()}
     out["area"] = {k: v * linear**2 for k, v in stats["area"].items()}
     out["diameter"] = {k: v * linear for k, v in stats["diameter"].items()}
     return out
@@ -166,11 +169,11 @@ def _rescale_stats(stats, linear):
 def calculate_empirical_thresholds(config):
     """
     Escanea las máscaras y obtiene, por magnificación (4x/10x) y por clase (1, 2, 3),
-    el promedio, p5 y p95 de área, diámetro equivalente y circularidad.
+    el promedio, p5 y p95 de área, diámetro equivalente, circularidad y perímetro.
     Si una clase no tiene ejemplos en una magnificación, se extrapola desde la otra
-    (x2.5 en diámetro, x6.25 en área, circularidad igual).
+    (x2.5 en diámetro y perímetro, x6.25 en área, circularidad igual).
 
-    Devuelve {"4x": {"c1": {"n", "area", "diameter", "circularity"}, "c2": ..., "c3": ...}, "10x": ...}
+    Devuelve {"4x": {"c1": {"n", "area", "diameter", "circularity", "perimeter"}, "c2": ..., "c3": ...}, "10x": ...}
     con cada métrica = {"mean", "p5", "p95"}.
     """
     import glob
@@ -217,26 +220,176 @@ def calculate_empirical_thresholds(config):
         thresholds["10x"][f"c{c}"] = s10
 
     for mag in ["4x", "10x"]:
-        print(f"\n[Estadísticas Empíricas Extraídas - {mag}]  (n, diámetro p5-p95, circularidad p5-p95)")
+        print(f"\n[Estadísticas Empíricas Extraídas - {mag}]  (n, diámetro, perímetro y circularidad p5-p95)")
         for c in [1, 2, 3]:
             t = thresholds[mag][f"c{c}"]
             print(f"  C{c}: n={t['n']}  diam {t['diameter']['p5']:.1f}-{t['diameter']['p95']:.1f}"
+                  f"  perim {t['perimeter']['p5']:.1f}-{t['perimeter']['p95']:.1f}"
                   f"  circ {t['circularity']['p5']:.3f}-{t['circularity']['p95']:.3f}")
     print()
 
     return thresholds
 
 
+# ---------- Post-procesado por reglas ----------
+# Una regla: {"name", "enabled", "class": "any" | id, "conditions": [{"metric", "op",
+# "value"}] (todas deben cumplirse), "action": "delete" | "reclass" | "keep", "to": id}.
+# `value` es un número (píxeles) o una referencia "c<id>.<p5|mean|p95>" a la
+# estadística de entrenamiento de esa clase, de la misma métrica y magnificación.
+# Se evalúan en orden sobre cada componente (8-conexo, por clase predicha), como una
+# cadena: "reclass" cambia la clase y sigue con las reglas siguientes (que ya ven la
+# clase nueva); "delete" y "keep" terminan. Si ninguna aplica, queda como está.
+POSTPROCESS_METRICS = ("area", "diameter", "circularity", "perimeter")
+POSTPROCESS_OPS = {"lt": lambda a, b: a < b, "le": lambda a, b: a <= b,
+                   "gt": lambda a, b: a > b, "ge": lambda a, b: a >= b}
+POSTPROCESS_ACTIONS = ("delete", "reclass", "keep")
+_REFERENCE = re.compile(r"c(\d+)\.(p5|mean|p95)")
+
+DEFAULT_POSTPROCESS = {
+    "fill_holes": [2, 3],
+    "rules": [
+        {"name": "Descartar menores al p5 de la clase 1", "enabled": True, "class": "any",
+         "conditions": [{"metric": "diameter", "op": "lt", "value": "c1.p5"}],
+         "action": "delete"},
+        {"name": "Clase 1 grande y poco circular pasa a clase 2", "enabled": True, "class": 1,
+         "conditions": [{"metric": "diameter", "op": "gt", "value": "c1.p95"},
+                        {"metric": "circularity", "op": "lt", "value": "c1.p5"}],
+         "action": "reclass", "to": 2},
+    ],
+}
+
+
+def validate_postprocess(config):
+    """Levanta ValueError con un mensaje legible si `config` ({"rules", "fill_holes"})
+    no tiene el formato esperado."""
+    if not isinstance(config, dict) or not isinstance(config.get("rules"), list):
+        raise ValueError("postprocess debe ser {\"rules\": [...], \"fill_holes\": [...]}")
+    for k, rule in enumerate(config["rules"], 1):
+        where = f"regla {k}"
+        if not isinstance(rule, dict) or not isinstance(rule.get("conditions"), list):
+            raise ValueError(f"{where}: falta la lista 'conditions'")
+        if rule.get("class", "any") != "any" and not isinstance(rule["class"], int):
+            raise ValueError(f"{where}: 'class' debe ser 'any' o un id de clase")
+        if rule.get("action") not in POSTPROCESS_ACTIONS:
+            raise ValueError(f"{where}: 'action' debe ser una de {POSTPROCESS_ACTIONS}")
+        if rule["action"] == "reclass" and not isinstance(rule.get("to"), int):
+            raise ValueError(f"{where}: 'reclass' necesita 'to' (id de clase)")
+        for cond in rule["conditions"]:
+            if cond.get("metric") not in POSTPROCESS_METRICS:
+                raise ValueError(f"{where}: métrica inválida {cond.get('metric')!r}")
+            if cond.get("op") not in POSTPROCESS_OPS:
+                raise ValueError(f"{where}: operador inválido {cond.get('op')!r}")
+            value = cond.get("value")
+            is_ref = isinstance(value, str) and _REFERENCE.fullmatch(value)
+            if not (is_ref or (isinstance(value, (int, float)) and not isinstance(value, bool))):
+                raise ValueError(f"{where}: valor inválido {value!r} (número o 'c1.p5')")
+    for c in config.get("fill_holes", []):
+        if not isinstance(c, int):
+            raise ValueError("fill_holes debe ser una lista de ids de clase")
+
+
+def _resolve(value, metric, thresholds):
+    """Número de `value`; None si es una referencia que la estadística no cubre."""
+    if not isinstance(value, str):
+        return float(value)
+    class_id, stat = _REFERENCE.fullmatch(value).groups()
+    try:
+        return float(thresholds[f"c{class_id}"][metric][stat])
+    except (KeyError, TypeError):
+        return None
+
+
+def _component_measures(labels, stats, i, needed):
+    """Solo las métricas que alguna regla usa (el perímetro cuesta un findContours)."""
+    area = float(stats[i, cv2.CC_STAT_AREA])
+    out = {"area": area, "diameter": 2 * np.sqrt(area / np.pi)}
+    if needed & {"circularity", "perimeter"}:
+        x, y, w, h = (int(v) for v in stats[i, :4])
+        crop = (labels[max(y - 1, 0): y + h + 1, max(x - 1, 0): x + w + 1] == i).astype(np.uint8)
+        contours, _ = cv2.findContours(crop, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        perimeter = max((cv2.arcLength(c, True) for c in contours), default=0.0)
+        out["perimeter"] = float(perimeter)
+        out["circularity"] = float(4 * np.pi * area / perimeter**2) if perimeter > 0 else 0.0
+    return out
+
+
+def apply_postprocess(mask, config, thresholds=None, reasons=None):
+    """Aplica las reglas de `config` a `mask`. `thresholds` es la estadística de la
+    magnificación ({"c1": {"diameter": {"p5": ...}}}). Devuelve (máscara limpia,
+    descartados): `descartados` tiene, donde una regla `delete` quitó un componente,
+    el id de clase que tenía. Una regla cuya referencia la estadística no cubre se
+    omite con un aviso en stderr. Si `reasons` es una lista, se le agrega un dict por
+    cada componente descartado: {"x", "y" (un píxel de adentro), "class" (original),
+    "as_class" (la que tenía al descartarse, si otra regla lo reclasificó antes),
+    "rule" (nombre), "conditions": [{"metric", "op", "value", "reference", "actual"}]}."""
+    validate_postprocess(config)
+    thresholds = thresholds or {}
+    rules = []
+    for rule in config["rules"]:
+        if not rule.get("enabled", True):
+            continue
+        conds, conds_info = [], []
+        for cond in rule["conditions"]:
+            value = _resolve(cond["value"], cond["metric"], thresholds)
+            if value is None:
+                print(f"AVISO: regla {rule.get('name', '?')!r} omitida: "
+                      f"sin estadística para {cond['value']!r}.", file=sys.stderr)
+                break
+            conds.append((cond["metric"], POSTPROCESS_OPS[cond["op"]], value))
+            conds_info.append({"metric": cond["metric"], "op": cond["op"], "value": value,
+                               "reference": cond["value"] if isinstance(cond["value"], str) else None})
+        else:
+            rules.append((rule.get("class", "any"), conds, rule["action"], rule.get("to"),
+                          rule.get("name", ""), conds_info))
+
+    cleaned = np.zeros(mask.shape, dtype=np.uint8)
+    discarded = np.zeros(mask.shape, dtype=np.uint8)
+    needed = {m for r in rules for m, _, _ in r[1]}
+    for c in (int(v) for v in np.unique(mask) if v != 0):
+        num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(
+            (mask == c).astype(np.uint8), connectivity=8)
+        for i in range(1, num_labels):
+            measures = _component_measures(labels, stats, i, needed) if rules else {}
+            final_class = c
+            reason = None
+            for rule_class, conds, action, to, name, conds_info in rules:
+                if rule_class not in ("any", final_class):
+                    continue
+                if not all(op(measures[m], v) for m, op, v in conds):
+                    continue
+                if action == "reclass":
+                    final_class = to        # sigue con las reglas siguientes
+                    continue
+                if action == "delete":
+                    reason = {"rule": name, "as_class": final_class,
+                              "conditions": [{**info, "actual": float(measures[info["metric"]])}
+                                             for info in conds_info]}
+                    final_class = 0
+                break
+            where = labels == i
+            if final_class == 0:
+                discarded[where] = c
+                if reasons is not None:
+                    ys, xs = np.nonzero(where)
+                    reasons.append({"x": int(xs[0]), "y": int(ys[0]), "class": c, **reason})
+            else:
+                cleaned[where] = final_class
+
+    # Consolidación física: rellenar agujeros dentro de las masas de las clases indicadas
+    for c in config.get("fill_holes", []):
+        class_mask = (cleaned == c).astype(np.uint8)
+        if np.sum(class_mask) == 0:
+            continue
+        contours, _ = cv2.findContours(class_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(cleaned, contours, -1, c, thickness=cv2.FILLED)
+    return cleaned, discarded
+
+
 def postprocess_mask(mask, filename, empirical_thresholds):
-    """Limpia la máscara con los umbrales empíricos de la clase 1 (solo 2 reglas):
-
-    1. Descarta todo componente (de cualquier clase) con diámetro equivalente menor
-       al p5 de la clase 1.
-    2. Un componente de clase 1 con diámetro mayor al p95 de la clase 1 Y circularidad
-       menor al p5 de la clase 1 pasa a clase 2.
-
-    Después rellena los huecos de las clases 2 y 3.
-    """
+    """Post-procesado por defecto (DEFAULT_POSTPROCESS) con los umbrales empíricos de
+    la clase 1: descarta todo componente con diámetro menor al p5 de la clase 1, y
+    pasa a clase 2 un componente de clase 1 con diámetro mayor al p95 y circularidad
+    menor al p5. Después rellena los huecos de las clases 2 y 3."""
     if not empirical_thresholds:
         return mask # Fallback si el yaml no tiene thresholds guardados
 
@@ -248,40 +401,4 @@ def postprocess_mask(mask, filename, empirical_thresholds):
         print("AVISO: umbrales empíricos en formato viejo; se omite el post-procesado.",
               file=sys.stderr)
         return mask
-    min_diam = th["c1"]["diameter"]["p5"]
-    max_diam = th["c1"]["diameter"]["p95"]
-    min_circ = th["c1"]["circularity"]["p5"]
-
-    cleaned_mask = np.zeros(mask.shape, dtype=np.uint8)
-
-    for c in [1, 2, 3]:
-        class_mask = (mask == c).astype(np.uint8)
-        num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(class_mask, connectivity=8)
-
-        for i in range(1, num_labels):
-            area = stats[i, cv2.CC_STAT_AREA]
-            diam = 2 * np.sqrt(area / np.pi)
-
-            # Regla 1: absurdo por tamaño, sin importar la clase predicha
-            if diam < min_diam:
-                continue
-
-            final_class = c
-
-            # Regla 2: C1 grande Y poco circular -> es C2
-            if c == 1 and diam > max_diam:
-                _, _, circ = component_shape_metrics(labels, stats, i)
-                if circ < min_circ:
-                    final_class = 2
-
-            cleaned_mask[labels == i] = final_class
-
-    # Consolidación física: rellenar agujeros dentro de las masas de clase 2 y 3
-    for c in [2, 3]:
-        class_mask = (cleaned_mask == c).astype(np.uint8)
-        if np.sum(class_mask) == 0:
-            continue
-        contours, _ = cv2.findContours(class_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(cleaned_mask, contours, -1, c, thickness=cv2.FILLED)
-
-    return cleaned_mask
+    return apply_postprocess(mask, DEFAULT_POSTPROCESS, th)[0]
