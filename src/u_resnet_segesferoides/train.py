@@ -15,6 +15,7 @@ from u_resnet_segesferoides.dataset import (
     prepare_data,
     preprocess_input,
 )
+from u_resnet_segesferoides.export_onnx import export_run_to_onnx
 from u_resnet_segesferoides.utils import (
     calculate_empirical_thresholds,
     colorize_mask,
@@ -212,6 +213,14 @@ def train_model(config_path):
     with open(metrics_path, "w") as f:
         f.write(f"Mejor Val Loss: {best_val_loss:.4f}\n")
         f.write(f"Val IoU en ese punto: {best_val_iou:.4f}\n")
+
+    # Exporta el MEJOR checkpoint (best_model.pth, no los pesos de la última época).
+    # Si falla no se aborta: el entrenamiento ya terminó y los pesos .pth están guardados.
+    try:
+        onnx_path = export_run_to_onnx(run_dir, config)
+        print(f"ONNX guardado en {onnx_path}")
+    except Exception as exc:  # noqa: BLE001
+        print(f"AVISO: no se pudo exportar a ONNX: {exc}")
 
     for test_img, _ in test_pairs:
         run_inference(model, test_img, config, device, run_name)

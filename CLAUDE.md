@@ -29,6 +29,15 @@ resultados medidos; cualquier cambio ahí es un experimento, no un refactor.
 - Lint: `uv run ruff check .`
 - Train: `uv run u-resnet-train --config configs/insitu_3t3.yaml`
 - Inferencia: `uv run u-resnet-infer --config configs/insitu_3t3.yaml`
+- ONNX: al terminar `u-resnet-train` se guarda también `best_model.onnx` en la carpeta del run
+  (exportado desde `best_model.pth`, no de la última época; si falla solo avisa). Para runs viejos:
+  `uv run u-resnet-export-onnx --run-dir outputs/models/<run>`. Entrada: imagen ya preprocesada
+  (ImageNet, múltiplo de 32), NCHW, H/W dinámicos; salida: logits. Sin argmax/TTA/post-proceso.
+- Evaluación (análoga a `spheroid_seg.eval`): `uv run u-resnet-eval --config configs/insitu_3t3.yaml --split test [--run-dir outputs/models/<run>]`.
+  Imagen completa (+TTA del run), confusión pooled, Dice/IoU/precisión/recall por clase,
+  por magnificación, vista de 3 clases (2+3 fusionadas), métrica `object`, Brier/log loss
+  sobre softmax, y las mismas métricas post-procesado. Escribe `outputs/evals/<run>_<split>/`.
+  Código en `src/u_resnet_segesferoides/evaluate.py`; tests en `tests/test_evaluate.py`.
 
 ## Datos
 

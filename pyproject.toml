@@ -8,6 +8,7 @@ dependencies = [
     "albumentations>=2.0.8",
     "matplotlib>=3.10.9",
     "numpy>=2.2.6",
+    "onnx>=1.17.0",
     "opencv-python-headless>=5.0.0.93",
     "pillow>=12.3.0",
     "scipy>=1.15.3",
@@ -21,7 +22,10 @@ dependencies = [
 [project.scripts]
 u-resnet-train = "u_resnet_segesferoides.train:main"
 u-resnet-infer = "u_resnet_segesferoides.inference:main"
+u-resnet-eval = "u_resnet_segesferoides.evaluate:main"
+u-resnet-eval-yolo = "u_resnet_segesferoides.evaluate_yolo:main"
 u-resnet-serve = "u_resnet_segesferoides.serve:main"
+u-resnet-export-onnx = "u_resnet_segesferoides.export_onnx:main"
 
 [dependency-groups]
 dev = [
