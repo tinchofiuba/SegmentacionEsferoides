@@ -9,7 +9,7 @@ Por defecto es un dry-run; con --apply renombra y escribe el mapeo base -> aumen
 en `splits/insitu_3t3/magnifications.txt` (versionado, sirve para revertir).
 
     uv run python scripts/data_prep/add_magnification_suffix.py \
-        /media/martin/D/Mascaras-*.zip --raw-dir /media/martin/D/ImgCrudas [--apply]
+        <Mascaras-*.zip> --raw-dir <ImgCrudas> [--apply]
 """
 import argparse
 import os

@@ -80,7 +80,7 @@ máscaras de 1 canal en escala de grises con el valor de píxel = id de clase
 (0-3), formato más estándar y liviano. El mapeo de clases coincide 1 a 1
 entre ambos repos, así que es una diferencia solo de codificación, no
 semántica. Diferido a propósito: decidir si (a) se convierten las 96
-máscaras físicas en `/media/martin/D/ImgTaggeadas` a grayscale, o (b)
+máscaras físicas de `ImgTaggeadas` a grayscale, o (b)
 `load_mask_labels` pasa a soportar ambos formatos sin tocar los archivos
 originales.
 

@@ -1,4 +1,6 @@
 """El motor de reglas con las reglas por defecto reproduce el post-procesado fijo anterior."""
+import sys
+
 import cv2
 import numpy as np
 import pytest
@@ -10,6 +12,7 @@ from u_resnet_segesferoides.utils import (
     postprocess_mask,
     validate_postprocess,
 )
+
 
 def legacy_postprocess_mask(mask, filename, empirical_thresholds):
     """Limpia la máscara con los umbrales empíricos de la clase 1 (solo 2 reglas):

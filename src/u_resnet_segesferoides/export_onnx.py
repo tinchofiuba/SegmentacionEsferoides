@@ -11,10 +11,44 @@ import os
 
 import segmentation_models_pytorch as smp
 import torch
+import yaml
 
 from u_resnet_segesferoides.config import load_config
 
 DEFAULT_OPSET = 17
+
+# Clases con id > 0 (el 0 es fondo) y color RGB: mismo mapeo que `MASK_COLOR_TO_CLASS` (dataset.py, que está en BGR; acá en RGB).
+MANIFEST_CLASSES = [
+    {"id": 1, "name": "células sueltas", "color": [0, 255, 0]},
+    {"id": 2, "name": "esferoides", "color": [255, 255, 0]},
+    {"id": 3, "name": "atípicos", "color": [0, 255, 255]},
+]
+
+
+def build_manifest(config, name):
+    """Manifiesto para la GUI (GUI_SegmentacionEsferoides, docs/model_manifest.md)."""
+    num_classes = config["training"]["num_classes"]
+    manifest = {
+        "schema": 1,
+        "name": name,
+        "output": "semantic",
+        "input": {"color": "rgb", "normalize": "imagenet", "pad_multiple": 32,
+                  "tta": ["hflip", "vflip", "hvflip"]},
+        "classes": [c for c in MANIFEST_CLASSES if c["id"] < num_classes],
+        "magnifications": ["4x", "10x"],
+        "options": [{"id": "tta", "label": "Utilizar TTA",
+                     "default": bool(config.get("inference", {}).get("use_tta", True))}],
+    }
+    return manifest
+
+
+def write_manifest(onnx_path, config, name=None):
+    """Escribe `<onnx>.yaml` al lado del .onnx (mismo nombre, extensión .yaml)."""
+    path = os.path.splitext(onnx_path)[0] + ".yaml"
+    name = name or os.path.basename(os.path.dirname(os.path.abspath(onnx_path)))
+    with open(path, "w", encoding="utf-8") as f:
+        yaml.safe_dump(build_manifest(config, name), f, allow_unicode=True, sort_keys=False)
+    return path
 
 
 def export_run_to_onnx(run_dir, config=None, out_path=None):
@@ -45,6 +79,7 @@ def export_run_to_onnx(run_dir, config=None, out_path=None):
         opset_version=opset,
         dynamo=False,
     )
+    write_manifest(out_path, config)
     return out_path
 
 

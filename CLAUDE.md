@@ -38,6 +38,10 @@ resultados medidos; cualquier cambio ahí es un experimento, no un refactor.
   por magnificación, vista de 3 clases (2+3 fusionadas), métrica `object`, Brier/log loss
   sobre softmax, y las mismas métricas post-procesado. Escribe `outputs/evals/<run>_<split>/`.
   Código en `src/u_resnet_segesferoides/evaluate.py`; tests en `tests/test_evaluate.py`.
+- Evaluación YOLOv8-seg (mismas métricas, mismo split, para comparar cabeza a cabeza):
+  `uv run --with ultralytics u-resnet-eval-yolo --run-dir <dir del modelo YOLO>`. `ultralytics`
+  no es dependencia del proyecto. Sin Brier/log loss ni variante post-procesada (YOLO no da
+  probabilidades por píxel). Código en `src/u_resnet_segesferoides/evaluate_yolo.py`.
 
 ## Datos
 
@@ -45,12 +49,12 @@ Las imágenes y máscaras NO viven en el repo (son pesadas y privadas). Cada
 dataset tiene su propia carpeta bajo `data/<dataset>/`, con `raw/` y `masks/`
 como **symlinks** a la ubicación real — todo `data/` está gitignoreado.
 
-Setup del dataset vigente (`insitu_3t3`, en `/media/martin/D`):
+Setup del dataset vigente (`insitu_3t3`; las rutas de origen dependen de cada máquina, ej. `/ruta/a`):
 
 ```bash
 mkdir -p data/insitu_3t3
-ln -s /media/martin/D/ImgCrudas data/insitu_3t3/raw
-ln -s /media/martin/D/ImgTaggeadas data/insitu_3t3/masks
+ln -s /ruta/a/ImgCrudas data/insitu_3t3/raw
+ln -s /ruta/a/ImgTaggeadas data/insitu_3t3/masks
 ```
 
 `configs/default.yaml` es un config legacy de la primera ronda de
@@ -59,7 +63,7 @@ histórica, no como algo a correr.
 
 ## Convenciones
 
-- Los hiperparámetros (crop_size, batch_size, lr, splits, etc.) viven
+- Los hiperparámetros (crop_size, batch_size, lr, num_workers, splits, etc.) viven
   **únicamente** en `configs/*.yaml`. No hardcodear valores en el código.
 - Splits reproducibles: si un config define `paths.splits_dir`, el split
   train/val/test se lee de `<splits_dir>/{train,val,test}.txt` (listas de
@@ -103,33 +107,20 @@ disco, o duplicaban lo que ya hace `u-resnet-train`/`u-resnet-infer` — ver
 - `viz/generate_comparison_images.py`, `viz/regenerate_comparisons.py`:
   collages de comparación sobre un modelo ya entrenado, sin reentrenar.
 
-## Backend para GUIs externas (`serve`)
+## Integración con la GUI (ONNX + manifiesto)
 
-La GUI de predicción/tagging **no vive en este repo**: está en
-`GUI_SegmentacionEsferoides` (`tinchofiuba/GUI_SegmentacionEsferoides`) y no importa nada de este
-paquete. Este repo tampoco sabe nada de la GUI: solo expone
-`src/u_resnet_segesferoides/serve.py`, un servidor genérico por stdin/stdout
-(una petición JSON por línea → una respuesta) que cualquier cliente puede
-usar. Comandos: `info`, `list_models`, `load`, `predict`, `shutdown`; la
-imagen y la máscara se pasan por ruta de archivo. El protocolo (v1) está
-especificado en `docs/protocol.md` del repo de la GUI.
+La GUI (`GUI_SegmentacionEsferoides`, `tinchofiuba/GUI_SegmentacionEsferoides`) **no importa nada de
+este paquete ni usa `serve`**: solo corre modelos `.onnx` con `onnxruntime`, y cada `.onnx` lleva al
+lado un manifiesto `.yaml` (especificación en `docs/model_manifest.md` del repo de la GUI).
+`export_onnx.py` escribe ese manifiesto (`best_model.yaml`) junto a `best_model.onnx` al exportar:
+clases/colores (`MANIFEST_CLASSES`, mismo mapeo que `MASK_COLOR_TO_CLASS` pero en RGB), normalización
+ImageNet, `pad_multiple: 32` y las 3 vistas de TTA. Si cambia el preprocesado, el TTA o las clases,
+hay que actualizar `build_manifest` (y `tests/test_export_onnx.py`). La GUI se distribuye con los
+modelos aparte: se pasan `best_model.onnx` + `best_model.yaml` y se instalan desde la GUI
+("Instalar modelo...").
 
-```bash
-uv run python -m u_resnet_segesferoides.serve --models-dir outputs/models \
-    [--model-name insitu_3t3 | --run-dir outputs/models/<run>]
-```
-
-- Reusa `pad_image`, `preprocess_input`, `tta_inference`, `postprocess_mask`:
-  cero lógica de modelo duplicada. **Si hay `bbox`, recorta ANTES de inferir**
-  (preserva la escala en píxeles; nunca se reescala la imagen).
-- Lee `training.encoder_name` del `config.yaml` de cada run (default
-  resnet34), así sirve también runs EfficientNet.
-- stdout es solo protocolo (se redirige el resto a stderr): no hacer `print`
-  a stdout en el camino de `serve`. Tests en `tests/test_serve.py`.
-- Para usarlo desde la GUI: `config/backends.yaml` del repo de la GUI apunta a
-  `.venv/bin/python -m u_resnet_segesferoides.serve ...` de este repo.
-- `list_models` marca con una nota los runs sin `metrics.txt` (probablemente
-  entrenándose: su `best_model.pth` se sobrescribe).
+`src/u_resnet_segesferoides/serve.py` (protocolo stdin/stdout, `u-resnet-serve`) es el mecanismo
+anterior de la GUI; ya no lo usa nadie. Se mantiene por ahora (tests en `tests/test_serve.py`).
 
 ## Reportes de experimentos
 

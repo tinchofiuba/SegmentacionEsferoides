@@ -26,6 +26,7 @@ u-resnet-eval = "u_resnet_segesferoides.evaluate:main"
 u-resnet-eval-yolo = "u_resnet_segesferoides.evaluate_yolo:main"
 u-resnet-serve = "u_resnet_segesferoides.serve:main"
 u-resnet-export-onnx = "u_resnet_segesferoides.export_onnx:main"
+u-resnet-make-index = "u_resnet_segesferoides.make_index:main"
 
 [dependency-groups]
 dev = [

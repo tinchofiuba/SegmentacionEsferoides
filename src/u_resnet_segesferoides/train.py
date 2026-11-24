@@ -97,8 +97,10 @@ def train_model(config_path):
         patches_per_image=config["training"]["patches_per_image"]
     )
 
-    train_loader = DataLoader(train_dataset, batch_size=config["training"]["batch_size"], shuffle=True, num_workers=2)
-    val_loader = DataLoader(val_dataset, batch_size=config["training"]["batch_size"], shuffle=False, num_workers=2)
+    # num_workers configurable (training.num_workers, default 2): en Windows conviene 0.
+    num_workers = config["training"].get("num_workers", 2)
+    train_loader = DataLoader(train_dataset, batch_size=config["training"]["batch_size"], shuffle=True, num_workers=num_workers)
+    val_loader = DataLoader(val_dataset, batch_size=config["training"]["batch_size"], shuffle=False, num_workers=num_workers)
 
     # --- Modelo ---
     num_classes = config["training"]["num_classes"]

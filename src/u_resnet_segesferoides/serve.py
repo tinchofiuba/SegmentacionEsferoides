@@ -30,8 +30,8 @@ from u_resnet_segesferoides.utils import (
     apply_postprocess,
     find_latest_run_dir,
     pad_image,
-    validate_postprocess,
     tta_inference,
+    validate_postprocess,
 )
 
 PROTOCOL_VERSION = 1

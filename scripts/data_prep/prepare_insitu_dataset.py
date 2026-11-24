@@ -1,5 +1,5 @@
 """
-Convierte ImgCrudas + ImgTaggeadas (en /media/martin/D/) al formato que espera
+Convierte ImgCrudas + ImgTaggeadas (carpetas que se pasan por argumento) al formato que espera
 SpheroidDataset (src/dataset.py) y los deja listos para entrenar, sin duplicar
 trabajo ya hecho (re-ejecutar el script solo procesa pares nuevos o modificados).
 
@@ -10,23 +10,19 @@ Mapeo de color de la máscara (BGR, como lee OpenCV) a clase:
     cyan    (255, 255,   0) -> 3  atípicos
 
 Salida:
-    /media/martin/D/ImgTemporales/images/<basename>.tiff       (imagen cruda, sin cambios)
-    /media/martin/D/ImgTemporales/masks/<basename>-Outlined.tif (máscara de 1 canal, valores 0-3)
+    <out-dir>/images/<basename>.tiff       (imagen cruda, sin cambios)
+    <out-dir>/masks/<basename>-Outlined.tif (máscara de 1 canal, valores 0-3)
 
 Uso:
-    python scripts/prepare_insitu_dataset.py
+    uv run python scripts/data_prep/prepare_insitu_dataset.py \
+        --raw-dir <ImgCrudas> --tagged-dir <ImgTaggeadas> --out-dir <ImgTemporales>
 """
+import argparse
 import glob
 import os
 
 import cv2
 import numpy as np
-
-RAW_DIR = "/media/martin/D/ImgCrudas"
-TAGGED_DIR = "/media/martin/D/ImgTaggeadas"
-OUT_DIR = "/media/martin/D/ImgTemporales"
-OUT_IMAGES_DIR = os.path.join(OUT_DIR, "images")
-OUT_MASKS_DIR = os.path.join(OUT_DIR, "masks")
 
 COLOR_TO_CLASS = {
     (0, 255, 0): 1,     # verde -> células sueltas
@@ -48,6 +44,15 @@ def convert_mask_to_labels(tagged_path):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--raw-dir", required=True, help="imágenes crudas (*.png)")
+    parser.add_argument("--tagged-dir", required=True, help="máscaras a color (<base>-Mask.png)")
+    parser.add_argument("--out-dir", required=True, help="carpeta de salida (images/ y masks/)")
+    args = parser.parse_args()
+    RAW_DIR, TAGGED_DIR, OUT_DIR = args.raw_dir, args.tagged_dir, args.out_dir
+    OUT_IMAGES_DIR = os.path.join(OUT_DIR, "images")
+    OUT_MASKS_DIR = os.path.join(OUT_DIR, "masks")
+
     os.makedirs(OUT_IMAGES_DIR, exist_ok=True)
     os.makedirs(OUT_MASKS_DIR, exist_ok=True)
 
