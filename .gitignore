@@ -240,3 +240,6 @@ Resultados_Test_Final/
 *.onnx
 *.h5
 *.msgpack
+
+# Salida de u-resnet-make-index (se sube a un release de GitHub, no a git)
+release/

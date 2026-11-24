@@ -23,18 +23,20 @@ def sha256_of(path):
     return h.hexdigest()
 
 
-def build_index(run_dirs, out_dir, notes=None):
+def build_index(run_dirs, out_dir, notes=None, name=None):
+    if name and len(run_dirs) != 1:
+        raise ValueError("--name solo se puede usar con un único --run-dir")
     os.makedirs(out_dir, exist_ok=True)
     models = []
     for run_dir in run_dirs:
-        name = os.path.basename(os.path.normpath(run_dir))
+        model_name = name or os.path.basename(os.path.normpath(run_dir))
         onnx, manifest = (os.path.join(run_dir, f"best_model.{ext}") for ext in ("onnx", "yaml"))
         for path in (onnx, manifest):
             if not os.path.isfile(path):
                 raise FileNotFoundError(f"{path} no existe (exportar con u-resnet-export-onnx)")
-        shutil.copy2(manifest, os.path.join(out_dir, f"{name}.yaml"))
-        shutil.copy2(onnx, os.path.join(out_dir, f"{name}.onnx"))
-        entry = {"name": name, "onnx": f"{name}.onnx", "yaml": f"{name}.yaml", "sha256": sha256_of(onnx)}
+        shutil.copy2(manifest, os.path.join(out_dir, f"{model_name}.yaml"))
+        shutil.copy2(onnx, os.path.join(out_dir, f"{model_name}.onnx"))
+        entry = {"name": model_name, "onnx": f"{model_name}.onnx", "yaml": f"{model_name}.yaml", "sha256": sha256_of(onnx)}
         if notes:
             entry["notes"] = notes
         models.append(entry)
@@ -48,9 +50,10 @@ def main():
     parser = argparse.ArgumentParser(description="Genera el índice de modelos para la GUI.")
     parser.add_argument("--run-dir", action="append", required=True)
     parser.add_argument("--out", required=True)
+    parser.add_argument("--name", help="nombre del modelo (archivos y carpeta en la GUI); por defecto el del run")
     parser.add_argument("--notes", help="texto que la GUI muestra al ofrecer el modelo")
     args = parser.parse_args()
-    print(f"Índice en {build_index(args.run_dir, args.out, args.notes)}")
+    print(f"Índice en {build_index(args.run_dir, args.out, args.notes, args.name)}")
 
 
 if __name__ == "__main__":
